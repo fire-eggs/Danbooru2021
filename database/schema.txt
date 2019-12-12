@@ -1,0 +1,51 @@
+// Text of schema used for diagram via dbdiagram.io/d
+
+Table images as I {
+  image_id int [pk]
+  created_at text
+  uploaded_id int
+  score int
+  source text
+  md5 text
+  last_commented_at text
+  rating text
+  image_width int
+  image_height int
+  is_note_locked int
+  file_ext TEXT
+  last_noted_at TEXT
+  is_rating_locked INT
+  parent_id INT
+  has_children INT
+  approver_id INT
+  file_size INT
+  is_status_locked INT
+  up_score INT
+  down_score INT
+  is_pending INT
+  is_flagged INT
+  is_deleted INT
+  updated_at TEXT
+  is_banned INT
+  pixiv_id INT  
+}
+
+Table tags as T {
+  tag_id int [pk]
+  name text
+  category int
+}
+
+Table imageTags as IT {
+  image_id int
+  tag_id int
+}
+
+Table favs as F {
+  image_id int
+  faver_id text
+}
+
+Ref: IT.image_id > I.image_id
+Ref: IT.tag_id > T.tag_id
+Ref: F.image_id > I.image_id
