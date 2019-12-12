@@ -1,5 +1,5 @@
 
-makedb.py
+### makedb.py
 
 A script to create a sqlite database from the Danbooru2018 metadata files.
 
@@ -16,8 +16,11 @@ with the following important differences:
    to parse.
 
 
-dbquery.py
+### dbquery.py
 
 A helper utility to allow ad-hoc queries against the database. Stolen from
 the Python docs and tweaked.
 
+### The Schema
+
+![database schema](schema.png)
