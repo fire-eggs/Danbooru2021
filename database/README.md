@@ -3,6 +3,8 @@
 
 A script to create a sqlite database from the Danbooru2018 metadata files.
 
+**WARNING** : the full database is about **7.5G** in size!
+
 Inspired by:
 https://github.com/jxu/danbooru2018-metadata/blob/master/read_json.py
 
