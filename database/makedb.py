@@ -114,6 +114,8 @@ def main():
     c.execute('CREATE INDEX tags_dex on tags(name,tag_id)')
     c.execute('CREATE INDEX image_ids on images(image_id)')
     c.execute('CREATE INDEX image_tags on imageTags(tag_id)')
+    # useful index for looking up image by rating
+    c.execute('CREATE INDEX image_rate on images(image_id,rating)')
     
     
     for json_file in os.listdir(DATA_DIR):
