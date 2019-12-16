@@ -23,3 +23,31 @@ class DanbooruDB:
         res = self.cur.fetchall()
         return res[0]
         
+    def get_tags2(self, filter):
+        if filter == '':
+            return self.get_tags()
+        self.cur.execute('select name from tags where name like ? limit 100', (filter,))
+        return self.cur.fetchall()
+        
+    def getImageIdsForTag2(self,tag_name,rating):
+        if rating=='':
+            return self.getImageIdsForTag(tag_name)
+        params = (rating.lower(),tag_name[0])
+
+        # annoying, this variant is faster than join
+        self.cur.execute('''select image_id from images
+                            where rating=? and image_id in 
+                            (select image_id from imageTags where tag_id in 
+                                (select tag_id from tags where name=?)
+                            ) order by image_id ''', params)
+                            
+        #params = (tag_name[0],rating.lower())
+        # self.cur.execute('''select I.image_id from images I
+                            # join imageTags IT on I.image_id=IT.image_id
+                            # join tags T on IT.tag_id = T.tag_id
+                            # where T.name=? and I.rating=?
+                            # order by I.image_id''', 
+                            # params)
+        res = self.cur.fetchall()
+        return [i[0] for i in res] # list of tuples to list of ids
+        

@@ -2,9 +2,10 @@ import asyncio
 import os
 import tkinter as tk
 from tkinter import *
-from tkinter import ttk
+import PIL as pil
 from PIL import Image,ImageTk
 from danboorudb import *
+from filterview import *
 
 IMAGES_BASE = 'G:\\original\\'
 image_ids = ()
@@ -16,9 +17,18 @@ def onselect(evt):
     w = evt.widget
     index = int(w.curselection()[0])
     value = w.get(index)
-    image_ids = db.getImageIdsForTag(value)
+    image_ids = db.getImageIdsForTag2(value,filterClass.RatingFilter())
     image_index = 0
+    # TODO handle scenario where zero image ids
     update_image()
+
+def update_tags():
+    # TODO clear any existing image
+    tags = db.get_tags2(filterClass.NameFilter())
+    tagList.delete(0,END)
+    for t in tags:
+        tagList.insert(END, t)
+    tagList.selection_clear(0,END)
 
 def update_image():
     global image_ids
@@ -37,7 +47,7 @@ def update_image():
         
     imagePath = os.path.join(IMAGES_BASE, fold, str(which) + "." + ext[0])
     try:       
-        im = Image.open(imagePath)
+        im = pil.Image.open(imagePath)
         
         # resize image to output widget, preserving aspect ratio
         pw = pict.winfo_width()  - 4
@@ -57,7 +67,7 @@ def update_image():
             im2 = im.resize((newW, newH))
             #print("New:({0},{1})".format(newW,newH))
         
-        img = ImageTk.PhotoImage(im2)
+        img = pil.ImageTk.PhotoImage(im2)
         pict.config(image=img, bg= "#000000") #, width=pw, height=ph)
         pict.image = img
     except Exception as e:
@@ -80,6 +90,12 @@ def prevImage():
         image_index = len(image_ids) - 1
     update_image()
 
+def filterCall():
+    # print("called")
+    # print("Rating:{0}".format(filterClass.RatingFilter()))
+    # print("Tag:{0}".format(filterClass.NameFilter()))
+    update_tags()
+    
 tk_root = tk.Tk()
 tk_root.title("Danbooru Tag Browser")
 tk_root.minsize(600,400)
@@ -118,5 +134,6 @@ tagList.delete(0,END)
 for t in tags:
     tagList.insert(END, t)
 
+filterClass = FilterView(Toplevel(), filterCall)
 
 tk_root.mainloop()
