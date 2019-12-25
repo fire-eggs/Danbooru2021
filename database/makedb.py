@@ -74,7 +74,8 @@ def main():
                   is_deleted INT,
                   updated_at TEXT,
                   is_banned INT,
-                  pixiv_id INT)''')
+                  pixiv_id INT,
+                  user_delete INT DEFAULT 0)''')
 
     # tags
     c.execute('''CREATE TABLE tags
@@ -116,6 +117,7 @@ def main():
     c.execute('CREATE INDEX image_tags on imageTags(tag_id)')
     # useful index for looking up image by rating
     c.execute('CREATE INDEX image_rate on images(image_id,rating)')
+    c.execute('CREATE INDEX image_del on images(image_id,user_delete)')
     
     
     for json_file in os.listdir(DATA_DIR):
@@ -155,7 +157,7 @@ def main():
                 ((image_id, faver_id) for faver_id in json_line["favs"])
             c.executemany("INSERT OR IGNORE INTO favs VALUES (?,?)",
                           favs_values)
-
+        
         conn.commit()
 
     conn.close()

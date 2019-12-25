@@ -12,9 +12,16 @@ class DanbooruDB:
         return rows
         
     def getImageIdsForTag(self,tag_name):
-        self.cur.execute('''select image_id from imageTags 
-                            where tag_id= (select tag_id from tags where name=?)
-                            order by image_id''',tag_name)
+        # self.cur.execute('''select image_id from imageTags 
+                            # where tag_id= (select tag_id from tags where name=?)
+                            # order by image_id''',tag_name)
+                            
+        self.cur.execute('''select image_id from images
+                            where user_delete = 0 and image_id in 
+                            (select image_id from imageTags where tag_id in 
+                                (select tag_id from tags where name=?)
+                            ) order by image_id ''', tag_name)
+                            
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of ids
         
@@ -36,7 +43,7 @@ class DanbooruDB:
 
         # annoying, this variant is faster than join
         self.cur.execute('''select image_id from images
-                            where rating=? and image_id in 
+                            where user_delete = 0 and rating=? and image_id in 
                             (select image_id from imageTags where tag_id in 
                                 (select tag_id from tags where name=?)
                             ) order by image_id ''', params)
@@ -51,3 +58,11 @@ class DanbooruDB:
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of ids
         
+    def markAsDelete(self,image_id):
+        self.cur.execute('update images set user_delete=1 where image_id=?',(image_id,))
+        
+    def getTagsForImage(self,image_id):
+        self.cur.execute('''select name from tags where tag_id in 
+                            (select tag_id from imageTags where image_id=?)''',(image_id,))
+        res = self.cur.fetchall()
+        return [i[0] for i in res] # list of tuples to list of tags
