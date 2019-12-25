@@ -34,9 +34,16 @@ def update_image():
     global image_ids
     global image_index
     
-    info.config(text='Image {0} of {1}'.format(image_index+1,len(image_ids) ))
     which = image_ids[image_index]
     ext = db.getExtForImage(which)
+    tags = db.getTagsForImage(which)
+    tags.sort()
+    #print(','.join(tags))
+    
+    text0 = '{0}.{1}\n'.format(which,ext[0])
+    text1 = '{0}\n'.format(','.join(tags))
+    text2 = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
+    info.config(text=text0 + text1 + text2)
     
     # the containing folder is the last three digits of the image id
     # e.g. image "12345678" is in folder "0678". Notice the leading zero;
@@ -110,7 +117,7 @@ tagList.configure(yscrollcommand=sbar.set)
 sbar.pack(side=RIGHT, fill=Y)
 tagList.pack(side=LEFT, fill=BOTH, expand=Y)
 
-info=Label(tk_root, text=' ')
+info=Label(tk_root, text=' ', wraplength=145, justify=LEFT)
 pict=Label(tk_root, text=' ',relief=SUNKEN)
 
 btnPrev = Button(tk_root, text='Prev', command=prevImage)
