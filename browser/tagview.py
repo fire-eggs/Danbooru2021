@@ -22,19 +22,32 @@ def onselect(evt):
     # TODO handle scenario where zero image ids
     update_image()
 
+def clearImage(fault):
+    info.config(text="")
+    if fault:
+        pict.config(image='', bg="#FF0000")
+    else:
+        pict.config(image='', bg="#FFFFFF")
+        
 def update_tags():
-    # TODO clear any existing image
     tags = db.get_tags2(filterClass.NameFilter())
     tagList.delete(0,END)
     for t in tags:
         tagList.insert(END, t)
     tagList.selection_clear(0,END)
+    clearImage(False)
 
 def update_image():
     global image_ids
     global image_index
     
-    which = image_ids[image_index]
+    try:
+        which = image_ids[image_index]
+    except:
+        # no images satisfy tag / filters
+        clearImage(True)
+        return
+
     ext = db.getExtForImage(which)
     tags = db.getTagsForImage(which)
     tags.sort()
@@ -78,6 +91,7 @@ def update_image():
         pict.config(image=img, bg= "#000000") #, width=pw, height=ph)
         pict.image = img
     except Exception as e:
+        clearImage(True)
         print(e)
         return
 
