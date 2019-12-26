@@ -30,7 +30,8 @@ def clearImage(fault):
         pict.config(image='', bg="#FFFFFF")
         
 def update_tags():
-    tags = db.get_tags2(filterClass.NameFilter())
+    #tags = db.get_tags2(filterClass.NameFilter())
+    tags = db.get_tags3(filterClass.NameFilter(), filterClass.CategoryFilter())
     tagList.delete(0,END)
     for t in tags:
         tagList.insert(END, t)

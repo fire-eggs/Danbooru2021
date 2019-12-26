@@ -6,6 +6,8 @@ class DanbooruDB:
         self.conn.isolation_level = None
         self.cur = self.conn.cursor()
 
+        self.catDict={'a':1,'c':4,'d':0,'m':5,'s':3}
+
     def get_tags(self):
         self.cur.execute('select name from tags limit 100')
         rows = self.cur.fetchall()
@@ -34,6 +36,14 @@ class DanbooruDB:
         if filter == '':
             return self.get_tags()
         self.cur.execute('select name from tags where name like ? limit 100', (filter,))
+        return self.cur.fetchall()
+        
+    def get_tags3(self, filter, cat):
+        # TODO: 'not' category
+        if cat == '':
+            return self.get_tags2(filter)
+        params = (filter, self.catDict[cat.lower()])
+        self.cur.execute('select name from tags where name like ? and category = ?', params)
         return self.cur.fetchall()
         
     def getImageIdsForTag2(self,tag_name,rating):
