@@ -112,6 +112,18 @@ def prevImage():
         image_index = len(image_ids) - 1
     update_image()
 
+def delImage():
+    global image_ids
+    global image_index
+    try:
+        which = image_ids[image_index]
+    except:
+        # no images satisfy tag / filters
+        clearImage(True)
+        return
+    db.markAsDelete(which)
+    nextImage()
+    
 def filterCall():
     # print("called")
     # print("Rating:{0}".format(filterClass.RatingFilter()))
@@ -137,10 +149,12 @@ pict=Label(tk_root, text=' ',relief=SUNKEN)
 
 btnPrev = Button(tk_root, text='Prev', command=prevImage)
 btnNext = Button(tk_root, text='Next', command=nextImage)
+btnDel  = Button(tk_root, text='Delete', command=delImage)
 
 leftFrame.grid(row=0,column=0,sticky=NSEW,columnspan=2)
 btnPrev.grid(row=2,column=0,sticky=E)
 btnNext.grid(row=2,column=1,sticky=W)
+btnDel.grid(row=3,column=0,sticky=W)
 info.grid(row=1,column=0,columnspan=2,sticky=NSEW)
 pict.grid(row=0,column=2,sticky=NSEW,rowspan=3)
 
