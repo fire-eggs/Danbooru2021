@@ -9,7 +9,7 @@ from filterview import *
 
 IMAGES_BASE = 'G:\\original\\'
 image_ids = ()
-image_index = 0
+image_index = -1
 
 def onselect(evt):
     global image_ids
@@ -28,15 +28,22 @@ def clearImage(fault):
         pict.config(image='', bg="#FF0000")
     else:
         pict.config(image='', bg="#FFFFFF")
+    pict.image=None
         
 def update_tags():
+    global image_ids
+    global image_index
+    
+    image_index = -1
+    image_ids=()
+    clearImage(False)
+    
     #tags = db.get_tags2(filterClass.NameFilter())
     tags = db.get_tags3(filterClass.NameFilter(), filterClass.CategoryFilter())
     tagList.delete(0,END)
     for t in tags:
         tagList.insert(END, t)
     tagList.selection_clear(0,END)
-    clearImage(False)
 
 def pictresize(event):
     update_image()
@@ -45,6 +52,10 @@ def update_image():
     global image_ids
     global image_index
     
+    if image_index < 0:
+        clearImage(False)
+        return
+        
     try:
         which = image_ids[image_index]
     except:
