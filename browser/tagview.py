@@ -82,12 +82,13 @@ def update_image():
         #print("Imag:({0},{1})".format(iw,ih))
         im2 = im
         if (iw > pw or ih > ph):
-            if (iw < ih):
-                newH = ph
-                newW = int(pw * iw / ih)
-            else:
+            if (iw > ih):
+                newH = int((pw / iw) * ih)
                 newW = pw
-                newH = int(ph * ih / iw)
+            else:
+                newW = int((ph / ih) * iw)
+                newH = ph
+                
             im2 = im.resize((newW, newH))
             #print("New:({0},{1})".format(newW,newH))
         
