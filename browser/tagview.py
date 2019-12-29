@@ -38,6 +38,9 @@ def update_tags():
     tagList.selection_clear(0,END)
     clearImage(False)
 
+def pictresize(event):
+    update_image()
+    
 def update_image():
     global image_ids
     global image_index
@@ -146,6 +149,7 @@ tagList.pack(side=LEFT, fill=BOTH, expand=Y)
 
 info=Label(tk_root, text=' ', wraplength=145, justify=LEFT)
 pict=Label(tk_root, text=' ',relief=SUNKEN)
+pict.bind("<Configure>", pictresize)
 
 btnPrev = Button(tk_root, text='Prev', command=prevImage)
 btnNext = Button(tk_root, text='Next', command=nextImage)
@@ -156,7 +160,7 @@ btnPrev.grid(row=2,column=0,sticky=E)
 btnNext.grid(row=2,column=1,sticky=W)
 btnDel.grid(row=3,column=0,sticky=W)
 info.grid(row=1,column=0,columnspan=2,sticky=NSEW)
-pict.grid(row=0,column=2,sticky=NSEW,rowspan=3)
+pict.grid(row=0,column=2,sticky=NSEW,rowspan=4)
 
 tk_root.rowconfigure(0, weight=1)
 tk_root.columnconfigure(0, minsize=150, weight=0)
