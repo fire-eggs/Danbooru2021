@@ -93,7 +93,7 @@ def update_image():
             #print("New:({0},{1})".format(newW,newH))
         
         img = pil.ImageTk.PhotoImage(im2)
-        pict.config(image=img, bg= "#000000") #, width=pw, height=ph)
+        pict.config(image=img, bg= "#EFF4F7") #, width=pw, height=ph)
         pict.image = img
     except Exception as e:
         clearImage(True)
