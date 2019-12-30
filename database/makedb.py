@@ -132,6 +132,11 @@ def main():
             json_line = json.loads(raw_json_line)
             image_id = json_line["id"]
 
+            # Qwent's fileset stops at 3368713 - don't record metadata
+            # beyond that value
+            if (int)(image_id) > 3368713:
+                continue;
+                
             # table INSERTs
             images_values = list(json_line[key] for key in images_keys)
             # a little messy
