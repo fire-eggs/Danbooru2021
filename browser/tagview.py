@@ -10,6 +10,7 @@ from filterview import *
 from collections import defaultdict
 from operator import itemgetter
 from itertools import groupby
+from tkinter.font import Font
 
 IMAGES_BASE = 'G:\\original\\'
 image_ids = ()
@@ -56,13 +57,18 @@ def update_tags():
 def pictresize(event):
     update_image(True)
 
-def formatTagGroup(tagDict, start, cat):
+def formatTagGroup(tagDict, cat):
     text = ""
     if cat in tagDict:
         text = "\n".join(tagDict[cat]) + "\n"
-    text = '\n' + start + ':\n' + text
     return text
 
+def addTagGroup(info, head, text):
+        info.insert(END, "\n")
+        info.insert(END, head+":", ("bold",))
+        info.insert(END, "\n")
+        info.insert(END, text)
+    
 def update_image(imageOnly):
     global image_ids
     global image_index
@@ -83,25 +89,27 @@ def update_image(imageOnly):
     if not imageOnly:
         tags = db.getTagsForImage2(which)
 
+        # tuples of form (category,name) -> dict[category]
         tagDict = dict((k,[v[1] for v in itr]) for k,itr in groupby(tags, itemgetter(0)))
-        #print(tagDict)
 
         text0 = '{0}.{1}\n'.format(which,ext[0])
-        text1 = formatTagGroup(tagDict,'Copyright',3) # '\nCopyright:\n' + ("\n".join(tagDict[3]) + "\n" if 3 in tagDict else "")
-        text2 = formatTagGroup(tagDict, 'Artist', 1) #'\nArtist:\n' + ("\n".join(tagDict[1]) + "\n" if 1 in tagDict else "")
-        text3 = formatTagGroup(tagDict, 'Characters', 4) #'\nCharacters:\n' + ("\n".join(tagDict[4]) + "\n" if 4 in tagDict else "")
-        text4 = formatTagGroup(tagDict, 'Tags', 0) #'\nTags:\n' + ("\n".join(tagDict[0]) + "\n" if 0 in tagDict else "")
-        text5 = formatTagGroup(tagDict, 'Meta', 5) #'\nMeta:\n' + ("\n".join(tagDict[5]) if 5 in tagDict else "")
+        text1 = formatTagGroup(tagDict, 3)
+        text2 = formatTagGroup(tagDict, 1)
+        text3 = formatTagGroup(tagDict, 4)
+        text4 = formatTagGroup(tagDict, 0)
+        text5 = formatTagGroup(tagDict, 5)
     
-    
-    #tags.sort()
-    #print(','.join(tags))
-    
-#    text0 = '{0}.{1}\n'.format(which,ext[0])
-#    text1 = '{0}\n'.format(','.join(tags))
-    #info.config(text=text0 + text1 + text2)
         info.delete(1.0,END)
-        info.insert(1.0,text0+text1+text2+text3+text4+text5)
+        info.insert(END, text0, ("bold",))
+        addTagGroup(info, "Copyright", text1)
+        addTagGroup(info, "Artist", text2)
+        addTagGroup(info, "Characters", text3)
+        addTagGroup(info, "Tags", text4)
+        addTagGroup(info, "Meta", text5)
+        
+        bfont = Font(family="Helvetica", size=10, weight="bold")  # TODO make global?      
+        info.tag_configure("bold", font=bfont)
+        
         icText = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
         imageCount.config(text=icText)
     
