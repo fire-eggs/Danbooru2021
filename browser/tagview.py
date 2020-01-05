@@ -24,7 +24,7 @@ def onselect(evt):
     image_ids = db.getImageIdsForTag2(value,filterClass.RatingFilter())
     image_index = 0
     # TODO handle scenario where zero image ids
-    update_image()
+    update_image(False)
 
 def clearImage(fault):
     #info.config(text="")
@@ -52,7 +52,8 @@ def update_tags():
     tagList.selection_clear(0,END)
 
 def pictresize(event):
-    update_image()
+    update_image(True)
+
 def formatTagGroup(tagDict, start, cat):
     text = ""
     if cat in tagDict:
@@ -60,7 +61,7 @@ def formatTagGroup(tagDict, start, cat):
     text = '\n' + start + ':\n' + text
     return text
 
-def update_image():
+def update_image(imageOnly):
     global image_ids
     global image_index
     
@@ -77,6 +78,7 @@ def update_image():
 
     ext = db.getExtForImage(which)
 
+    if not imageOnly:
         tags = db.getTagsForImage2(which)
 
         tagDict = dict((k,[v[1] for v in itr]) for k,itr in groupby(tags, itemgetter(0)))
@@ -145,7 +147,7 @@ def nextImage():
     image_index+=1
     if image_index >= len(image_ids):
         image_index = 0
-    update_image()
+    update_image(False)
 
 def prevImage():
     global image_ids
@@ -153,7 +155,7 @@ def prevImage():
     image_index-=1
     if image_index < 0:
         image_index = len(image_ids) - 1
-    update_image()
+    update_image(False)
 
 def delImage():
     global image_ids
