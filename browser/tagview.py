@@ -19,12 +19,14 @@ def onselect(evt):
     global image_ids
     global image_index
     w = evt.widget
-    index = int(w.curselection()[0])
-    value = w.get(index)
-    image_ids = db.getImageIdsForTag2(value,filterClass.RatingFilter())
-    image_index = 0
+    blah = w.curselection()
+    if blah:
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        image_ids = db.getImageIdsForTag2(value,filterClass.RatingFilter())
+        image_index = 0
     # TODO handle scenario where zero image ids
-    update_image(False)
+        update_image(False)
 
 def clearImage(fault):
     #info.config(text="")
