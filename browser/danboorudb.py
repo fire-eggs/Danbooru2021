@@ -8,11 +8,6 @@ class DanbooruDB:
 
         self.catDict={'a':1,'c':4,'d':0,'m':5,'s':3}
 
-    def get_tags(self):
-        self.cur.execute('select name from tags limit 100')
-        rows = self.cur.fetchall()
-        return rows
-        
     def getImageIdsForTag(self,tag_name):
         # self.cur.execute('''select image_id from imageTags 
                             # where tag_id= (select tag_id from tags where name=?)
@@ -31,11 +26,16 @@ class DanbooruDB:
         self.cur.execute('select file_ext from images where image_id=?', (image_id,))
         res = self.cur.fetchall()
         return res[0]
-        
+
+    def get_tags(self):
+        self.cur.execute('select name from tags order by name limit 100')
+        rows = self.cur.fetchall()
+        return rows
+                
     def get_tags2(self, filter):
         if filter == '':
             return self.get_tags()
-        self.cur.execute('select name from tags where name like ? limit 100', (filter,))
+        self.cur.execute('select name from tags where name like ? order by name', (filter,))
         return self.cur.fetchall()
         
     def get_tags3(self, filter, cat):
@@ -43,7 +43,7 @@ class DanbooruDB:
         if cat == '':
             return self.get_tags2(filter)
         params = (filter, self.catDict[cat.lower()])
-        self.cur.execute('select name from tags where name like ? and category = ?', params)
+        self.cur.execute('select name from tags where name like ? and category = ? order by name', params)
         return self.cur.fetchall()
         
     def getImageIdsForTag2(self,tag_name,rating):
