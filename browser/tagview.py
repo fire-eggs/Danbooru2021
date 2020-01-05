@@ -2,10 +2,14 @@ import asyncio
 import os
 import tkinter as tk
 from tkinter import *
+import tkinter.scrolledtext as tkst
 import PIL as pil
 from PIL import Image,ImageTk
 from danboorudb import *
 from filterview import *
+from collections import defaultdict
+from operator import itemgetter
+from itertools import groupby
 
 IMAGES_BASE = 'G:\\original\\'
 image_ids = ()
@@ -23,11 +27,13 @@ def onselect(evt):
     update_image()
 
 def clearImage(fault):
-    info.config(text="")
+    #info.config(text="")
+    info.delete(1.0,END)
     if fault:
         pict.config(image='', bg="#FF0000")
     else:
         pict.config(image='', bg="#FFFFFF")
+        imageCount.config(text="")
     pict.image=None
         
 def update_tags():
@@ -47,7 +53,13 @@ def update_tags():
 
 def pictresize(event):
     update_image()
-    
+def formatTagGroup(tagDict, start, cat):
+    text = ""
+    if cat in tagDict:
+        text = "\n".join(tagDict[cat]) + "\n"
+    text = '\n' + start + ':\n' + text
+    return text
+
 def update_image():
     global image_ids
     global image_index
@@ -64,14 +76,30 @@ def update_image():
         return
 
     ext = db.getExtForImage(which)
-    tags = db.getTagsForImage(which)
-    tags.sort()
+
+        tags = db.getTagsForImage2(which)
+
+        tagDict = dict((k,[v[1] for v in itr]) for k,itr in groupby(tags, itemgetter(0)))
+        #print(tagDict)
+
+        text0 = '{0}.{1}\n'.format(which,ext[0])
+        text1 = formatTagGroup(tagDict,'Copyright',3) # '\nCopyright:\n' + ("\n".join(tagDict[3]) + "\n" if 3 in tagDict else "")
+        text2 = formatTagGroup(tagDict, 'Artist', 1) #'\nArtist:\n' + ("\n".join(tagDict[1]) + "\n" if 1 in tagDict else "")
+        text3 = formatTagGroup(tagDict, 'Characters', 4) #'\nCharacters:\n' + ("\n".join(tagDict[4]) + "\n" if 4 in tagDict else "")
+        text4 = formatTagGroup(tagDict, 'Tags', 0) #'\nTags:\n' + ("\n".join(tagDict[0]) + "\n" if 0 in tagDict else "")
+        text5 = formatTagGroup(tagDict, 'Meta', 5) #'\nMeta:\n' + ("\n".join(tagDict[5]) if 5 in tagDict else "")
+    
+    
+    #tags.sort()
     #print(','.join(tags))
     
-    text0 = '{0}.{1}\n'.format(which,ext[0])
-    text1 = '{0}\n'.format(','.join(tags))
-    text2 = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
-    info.config(text=text0 + text1 + text2)
+#    text0 = '{0}.{1}\n'.format(which,ext[0])
+#    text1 = '{0}\n'.format(','.join(tags))
+    #info.config(text=text0 + text1 + text2)
+        info.delete(1.0,END)
+        info.insert(1.0,text0+text1+text2+text3+text4+text5)
+        icText = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
+        imageCount.config(text=icText)
     
     # the containing folder is the last three digits of the image id
     # e.g. image "12345678" is in folder "0678". Notice the leading zero;
@@ -159,22 +187,26 @@ tagList.configure(yscrollcommand=sbar.set)
 sbar.pack(side=RIGHT, fill=Y)
 tagList.pack(side=LEFT, fill=BOTH, expand=Y)
 
-info=Label(tk_root, text=' ', wraplength=145, justify=LEFT)
+#info=Label(tk_root, text=' ', wraplength=145, justify=LEFT)
+info=tkst.ScrolledText(tk_root,width=30)
 pict=Label(tk_root, text=' ',relief=SUNKEN)
 pict.bind("<Configure>", pictresize)
 
+imageCount=Label(tk_root,text=' ', justify=RIGHT)
 btnPrev = Button(tk_root, text='Prev', command=prevImage)
 btnNext = Button(tk_root, text='Next', command=nextImage)
 btnDel  = Button(tk_root, text='Delete', command=delImage)
 
 leftFrame.grid(row=0,column=0,sticky=NSEW,columnspan=2)
-btnPrev.grid(row=2,column=0,sticky=E)
-btnNext.grid(row=2,column=1,sticky=W)
-btnDel.grid(row=3,column=0,sticky=W)
+imageCount.grid(row=2,column=0,sticky=E)
+btnPrev.grid(row=3,column=0,sticky=E)
+btnNext.grid(row=3,column=1,sticky=W)
+btnDel.grid(row=4,column=0,sticky=W)
 info.grid(row=1,column=0,columnspan=2,sticky=NSEW)
-pict.grid(row=0,column=2,sticky=NSEW,rowspan=4)
+pict.grid(row=0,column=2,sticky=NSEW,rowspan=5)
 
 tk_root.rowconfigure(0, weight=1)
+tk_root.rowconfigure(1, weight=1)
 tk_root.columnconfigure(0, minsize=150, weight=0)
 tk_root.columnconfigure(1, weight=0)
 tk_root.columnconfigure(2, weight=1)

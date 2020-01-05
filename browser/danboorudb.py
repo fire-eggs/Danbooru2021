@@ -76,3 +76,10 @@ class DanbooruDB:
                             (select tag_id from imageTags where image_id=?)''',(image_id,))
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of tags
+
+    def getTagsForImage2(self,image_id):
+        self.cur.execute('''select category,name from tags where tag_id in 
+                            (select tag_id from imageTags where image_id=?)
+                            order by category,name''',(image_id,))
+        res = self.cur.fetchall()
+        return res
