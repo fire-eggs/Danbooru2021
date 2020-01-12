@@ -83,3 +83,29 @@ class DanbooruDB:
                             order by category,name''',(image_id,))
         res = self.cur.fetchall()
         return res
+
+    def getImagesForTags(self, filter1, filter2):
+        # TODO rating
+        # TODO category per filter
+        # TODO arbitrary number of filters
+        start = 'select image_id from images where user_delete=0 and image_id in '
+        params = []
+        tag1 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name=?)'
+        params.append(filter1[2])
+        tag2 = ''
+        op = ''
+        if (filter2[2] != ''):
+            tag2 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name=?)'
+            params.append(filter2[2])
+            if (filter2[0] == 'OR'):
+                op = ' UNION '
+            if (filter2[0] == 'AND' or filter2[0] == ''):
+                op = ' INTERSECT '
+            if (filter2[1] == 'NOT'):
+                op = ' EXCEPT '
+        full = start + '(' + tag1 + op + tag2 + ')' + 'order by image_id'
+        #print(full)
+        #print(tuple(params))
+        self.cur.execute(full,params)
+        res = self.cur.fetchall()
+        return [i[0] for i in res]

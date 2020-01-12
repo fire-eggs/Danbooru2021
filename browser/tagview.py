@@ -7,6 +7,7 @@ import PIL as pil
 from PIL import Image,ImageTk
 from danboorudb import *
 from filterview import *
+from postsFilterView import *
 from collections import defaultdict
 from operator import itemgetter
 from itertools import groupby
@@ -184,6 +185,20 @@ def filterCall():
     # print("Rating:{0}".format(filterClass.RatingFilter()))
     # print("Tag:{0}".format(filterClass.NameFilter()))
     update_tags()
+
+def filterCall2():
+    global image_ids
+    global image_index
+
+    #print(str(postsFilter.TagFilter1()) + "&" + str(postsFilter.TagFilter2()))
+    
+    image_index = -1
+    image_ids=()
+    clearImage(False)
+    image_ids = db.getImagesForTags(postsFilter.TagFilter1(), \
+                                    postsFilter.TagFilter2())
+    image_index = 0
+    update_image(False)    
     
 tk_root = tk.Tk()
 tk_root.title("Danbooru Tag Browser")
@@ -231,5 +246,6 @@ for t in tags:
     tagList.insert(END, t)
 
 filterClass = FilterView(Toplevel(), filterCall)
+postsFilter = PostsFilter(Toplevel(), filterCall2)
 
 tk_root.mainloop()
