@@ -131,15 +131,17 @@ def update_image(imageOnly):
         
         #print("Pict:({0},{1})".format(pw,ph))
         iw,ih = im.size
+        newW,newH = im.size
         #print("Imag:({0},{1})".format(iw,ih))
         im2 = im
-        if (iw > pw):
-            newW = pw
-            newH = int((pw / iw) * ih)
-        else:
-            newW = int((ph / ih) * iw)
-            newH = ph
-            
+
+        if (iw > pw or ih > ph):
+            rw = pw / iw
+            rh = ph / ih
+            r =  min(rw, rh)
+            newH = int(ih * r)
+            newW = int(iw * r)
+                    
         im2 = im.resize((newW, newH))
         #print("New:({0},{1})".format(newW,newH))
                     
