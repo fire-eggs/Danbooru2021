@@ -133,17 +133,16 @@ def update_image(imageOnly):
         iw,ih = im.size
         #print("Imag:({0},{1})".format(iw,ih))
         im2 = im
-        if (iw > pw or ih > ph):
-            if (iw > ih):
-                newH = int((pw / iw) * ih)
-                newW = pw
-            else:
-                newW = int((ph / ih) * iw)
-                newH = ph
-                
-            im2 = im.resize((newW, newH))
-            #print("New:({0},{1})".format(newW,newH))
-        
+        if (iw > pw):
+            newW = pw
+            newH = int((pw / iw) * ih)
+        else:
+            newW = int((ph / ih) * iw)
+            newH = ph
+            
+        im2 = im.resize((newW, newH))
+        #print("New:({0},{1})".format(newW,newH))
+                    
         img = pil.ImageTk.PhotoImage(im2)
         pict.config(image=img, bg= "#EFF4F7") #, width=pw, height=ph)
         pict.image = img
