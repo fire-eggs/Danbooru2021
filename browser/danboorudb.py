@@ -28,7 +28,7 @@ class DanbooruDB:
         return res[0]
 
     def get_tags(self):
-        self.cur.execute('select name from tags order by name limit 100')
+        self.cur.execute('select name from tags order by name limit 1000')
         rows = self.cur.fetchall()
         return rows
                 

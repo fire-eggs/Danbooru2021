@@ -17,19 +17,6 @@ IMAGES_BASE = 'G:\\original\\'
 image_ids = ()
 image_index = -1
 
-def onselect(evt):
-    global image_ids
-    global image_index
-    w = evt.widget
-    blah = w.curselection()
-    if blah:
-        index = int(w.curselection()[0])
-        value = w.get(index)
-        image_ids = db.getImageIdsForTag2(value,filterClass.RatingFilter())
-        image_index = 0
-    # TODO handle scenario where zero image ids
-        update_image(False)
-
 def clearImage(fault):
     #info.config(text="")
     info.delete(1.0,END)
@@ -40,21 +27,6 @@ def clearImage(fault):
         imageCount.config(text="")
     pict.image=None
         
-def update_tags():
-    global image_ids
-    global image_index
-    
-    image_index = -1
-    image_ids=()
-    clearImage(False)
-    
-    #tags = db.get_tags2(filterClass.NameFilter())
-    tags = db.get_tags3(filterClass.NameFilter(), filterClass.CategoryFilter())
-    tagList.delete(0,END)
-    for t in tags:
-        tagList.insert(END, t)
-    tagList.selection_clear(0,END)
-
 def pictresize(event):
     update_image(True)
 
@@ -181,17 +153,18 @@ def delImage():
     db.markAsDelete(which)
     nextImage()
     
-def filterCall():
-    # print("called")
-    # print("Rating:{0}".format(filterClass.RatingFilter()))
-    # print("Tag:{0}".format(filterClass.NameFilter()))
-    update_tags()
+def filterCall(tag):
+    global image_ids
+    global image_index
+    
+    image_ids = db.getImageIdsForTag2(tag,filterClass.RatingFilter())
+    image_index = 0
+    # TODO handle scenario where zero image ids
+    update_image(False)   
 
 def filterCall2():
     global image_ids
     global image_index
-
-    #print(str(postsFilter.TagFilter1()) + "&" + str(postsFilter.TagFilter2()))
     
     image_index = -1
     image_ids=()
@@ -205,48 +178,32 @@ tk_root = tk.Tk()
 tk_root.title("Danbooru Tag Browser")
 tk_root.minsize(600,400)
 
-leftFrame=Frame(tk_root)
-tagLabel = ttk.Labelframe(leftFrame, text='Tags')
-tagLabel.pack(side=TOP,expand=Y,fill=BOTH)
-tagList = Listbox(tagLabel, relief=SUNKEN)
-tagList.bind('<<ListboxSelect>>', onselect)
-sbar = ttk.Scrollbar(tagLabel, command=tagList.yview, orient=VERTICAL)
-tagList.configure(yscrollcommand=sbar.set)
-sbar.pack(side=RIGHT, fill=Y)
-tagList.pack(side=LEFT, fill=BOTH, expand=Y)
-
-#info=Label(tk_root, text=' ', wraplength=145, justify=LEFT)
+# Image info box
 info=tkst.ScrolledText(tk_root,width=30)
 pict=Label(tk_root, text=' ',relief=SUNKEN)
 pict.bind("<Configure>", pictresize)
 
+# image count and buttons
 imageCount=Label(tk_root,text=' ', justify=RIGHT)
 btnPrev = Button(tk_root, text='Prev', command=prevImage)
 btnNext = Button(tk_root, text='Next', command=nextImage)
 btnDel  = Button(tk_root, text='Delete', command=delImage)
 
-leftFrame.grid(row=0,column=0,sticky=NSEW,columnspan=2)
-imageCount.grid(row=2,column=0,sticky=E)
-btnPrev.grid(row=3,column=0,sticky=E)
-btnNext.grid(row=3,column=1,sticky=W)
-btnDel.grid(row=4,column=0,sticky=W)
-info.grid(row=1,column=0,columnspan=2,sticky=NSEW)
-pict.grid(row=0,column=2,sticky=NSEW,rowspan=5)
+pict.grid(row=0,column=2,sticky=NSEW,rowspan=4)
+info.grid(row=0,column=0,columnspan=2,sticky=NSEW)
+imageCount.grid(row=1,column=0,sticky=E)
+btnPrev.grid(row=2,column=0,sticky=E)
+btnNext.grid(row=2,column=1,sticky=W)
+btnDel.grid(row=3,column=0,sticky=W)
 
 tk_root.rowconfigure(0, weight=1)
-tk_root.rowconfigure(1, weight=1)
 tk_root.columnconfigure(0, minsize=150, weight=0)
 tk_root.columnconfigure(1, weight=0)
 tk_root.columnconfigure(2, weight=1)
 
 
 db = DanbooruDB()
-tags = db.get_tags()
-tagList.delete(0,END)
-for t in tags:
-    tagList.insert(END, t)
-
-filterClass = FilterView(Toplevel(), filterCall)
+filterClass = FilterView(Toplevel(), filterCall, db)
 postsFilter = PostsFilter(Toplevel(), filterCall2)
 
 tk_root.mainloop()
