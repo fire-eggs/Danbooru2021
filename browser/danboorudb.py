@@ -84,6 +84,46 @@ class DanbooruDB:
         res = self.cur.fetchall()
         return res
 
+    def tagSubClause(self, tFilter):
+        res = ''
+        val = ''
+        if (tFilter[2] != ''):
+            tag2 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name=?)'
+            if (tFilter[0] == 'OR'):
+                op = ' UNION '
+            if (tFilter[0] == 'AND' or filter2[0] == ''):
+                op = ' INTERSECT '
+            if (tFilter[1] == 'NOT'):
+                op = ' EXCEPT '
+            res = op + tag2
+            val = tFilter[2]
+        return res, val
+    
+    def getImagesForTags2(self, filter1, filter2, filter3, rating):
+        params = []
+        start = 'select image_id from images where user_delete=0 '
+        if rating != '':
+            params.append(rating.lower())
+            start += 'and rating=? '
+        start += 'and image_id in '
+        tag1 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name=?)'
+        params.append(filter1[2])
+
+        tag2, param2 = self.tagSubClause(filter2)
+        tag3, param3 = self.tagSubClause(filter3)
+
+        full = start + '(' + tag1 + tag2 + tag3 + ') order by image_id'
+        if (param2 != ''):
+            params.append(param2)
+            if (param3 != ''):
+                params.append(param3)
+        
+        print(full)
+        print(tuple(params))
+        self.cur.execute(full,params)
+        res = self.cur.fetchall()
+        return [i[0] for i in res]
+        
     def getImagesForTags(self, filter1, filter2):
         # TODO rating
         # TODO category per filter

@@ -1,5 +1,5 @@
 #
-# Filtering by tags
+# Finding tags
 # a) tag wildcard
 # b) tag category choice
 # c) list of tags
@@ -41,18 +41,9 @@ class FilterView(Frame):
         self.tagList.configure(yscrollcommand=sbar.set)
         sbar.pack(side=RIGHT, fill=Y)
         self.tagList.pack(side=LEFT, fill=BOTH, expand=Y)
-        
-        # Image rating
-        self.ratingFilter = IntVar()
-        self.ratingFilter.set(0)
-        rateBtn = Checkbutton(parent, text="Rating", variable=self.ratingFilter)
-        self.ratingText = StringVar()
-        rateCmb = ttk.Combobox(parent, values=["Safe","Questionable","Explicit"], textvariable=self.ratingText)
-        rateCmb.current(0)
-                        
+                                
         doitBtn = Button(parent, text="Apply Filter", command=self.update_tags)
 
-        
         tagLab.grid(column=0, row=0)
         txtTag1.grid(column=0, row=1, sticky=EW)
         catBtn.grid(column=0, row=2)
@@ -60,9 +51,6 @@ class FilterView(Frame):
         doitBtn.grid(column=0, row=4)
         leftFrame.grid(column=0, row=5, sticky=NSEW)
         
-        rateBtn.grid(column=0, row=6)
-        rateCmb.grid(column=0, row=7)
-
         parent.rowconfigure(5, weight=1)
         parent.columnconfigure(0, minsize=150, weight=1)
 

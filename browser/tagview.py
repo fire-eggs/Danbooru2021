@@ -157,7 +157,7 @@ def filterCall(tag):
     global image_ids
     global image_index
     
-    image_ids = db.getImageIdsForTag2(tag,filterClass.RatingFilter())
+    image_ids = db.getImageIdsForTag2(tag,postsFilter.RatingFilter())
     image_index = 0
     # TODO handle scenario where zero image ids
     update_image(False)   
@@ -169,8 +169,10 @@ def filterCall2():
     image_index = -1
     image_ids=()
     clearImage(False)
-    image_ids = db.getImagesForTags(postsFilter.TagFilter1(), \
-                                    postsFilter.TagFilter2())
+    image_ids = db.getImagesForTags2(postsFilter.TagFilter1(), \
+                                    postsFilter.TagFilter2(), \
+                                    postsFilter.TagFilter3(), \
+                                    postsFilter.RatingFilter())
     image_index = 0
     update_image(False)    
 
