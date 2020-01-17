@@ -173,6 +173,14 @@ def filterCall2():
                                     postsFilter.TagFilter2())
     image_index = 0
     update_image(False)    
+
+def keypress(event):
+    args = event.keysym, event.keycode, event.char 
+    #print("Symbol: {}, Code: {}, Char: {}".format(*args))
+    if (event.keysym == 'Next'):
+        nextImage()
+    if (event.keysym == 'Prior'):
+        prevImage()
     
 tk_root = tk.Tk()
 tk_root.title("Danbooru Tag Browser")
@@ -201,6 +209,7 @@ tk_root.columnconfigure(0, minsize=150, weight=0)
 tk_root.columnconfigure(1, weight=0)
 tk_root.columnconfigure(2, weight=1)
 
+tk_root.bind("<Key>", keypress)
 
 db = DanbooruDB()
 filterClass = FilterView(Toplevel(), filterCall, db)
