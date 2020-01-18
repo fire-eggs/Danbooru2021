@@ -84,3 +84,9 @@ class FilterView(Frame):
             self.tagList.insert(END,t)
         self.tagList.selection_clear(0,END)
         
+    def minimize(self):
+        self.master.withdraw()
+
+    def restore(self):
+        self.master.deiconify()
+        

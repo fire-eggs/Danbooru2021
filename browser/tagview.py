@@ -192,7 +192,21 @@ def keypress(event):
         prevImage()
     if (event.keysym == 'Home'):
         firstImage()
-    
+
+# User has minimized the window
+def minEvent(event):
+    if (str(event.widget) == '.'):
+        if (not tk_root.winfo_viewable()):
+            filterClass.minimize()
+            postsFilter.minimize()
+
+# User has restored the window
+def restoreEvent(event):
+    if (str(event.widget) == '.'):
+        if (tk_root.winfo_viewable()):
+            filterClass.restore()
+            postsFilter.restore()
+        
 tk_root = tk.Tk()
 tk_root.title("Danbooru Tag Browser")
 tk_root.minsize(600,400)
@@ -221,6 +235,8 @@ tk_root.columnconfigure(1, weight=0)
 tk_root.columnconfigure(2, weight=1)
 
 tk_root.bind("<Key>", keypress)
+tk_root.bind("<Unmap>", minEvent)
+tk_root.bind("<Map>", restoreEvent)
 
 db = DanbooruDB()
 filterClass = FilterView(Toplevel(), filterCall, db)

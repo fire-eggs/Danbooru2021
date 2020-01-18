@@ -90,3 +90,8 @@ class PostsFilter(Frame):
         self.vars3[1].set('')
         self.vars3[2].set('')
         
+    def minimize(self):
+        self.master.withdraw()
+        
+    def restore(self):
+        self.master.deiconify()
