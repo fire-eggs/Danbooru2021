@@ -84,6 +84,17 @@ class DanbooruDB:
         res = self.cur.fetchall()
         return res
 
+    def getRatingForImage(self, image_id):
+        self.cur.execute('select rating from images where image_id=?',(image_id,))
+        res = self.cur.fetchall()
+        if res[0][0] == 's':
+            return 'Safe'
+        if res[0][0] == 'q':
+            return 'Questionable'
+        if res[0][0] == 'e':
+            return 'Explicit'
+        return '?'
+
     def tagSubClause(self, tFilter):
         res = ''
         val = ''

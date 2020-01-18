@@ -58,33 +58,6 @@ def update_image(imageOnly):
         return
 
     ext = db.getExtForImage(which)
-
-    if not imageOnly:
-        tags = db.getTagsForImage2(which)
-
-        # tuples of form (category,name) -> dict[category]
-        tagDict = dict((k,[v[1] for v in itr]) for k,itr in groupby(tags, itemgetter(0)))
-
-        text0 = '{0}.{1}\n'.format(which,ext[0])
-        text1 = formatTagGroup(tagDict, 3)
-        text2 = formatTagGroup(tagDict, 1)
-        text3 = formatTagGroup(tagDict, 4)
-        text4 = formatTagGroup(tagDict, 0)
-        text5 = formatTagGroup(tagDict, 5)
-    
-        info.delete(1.0,END)
-        info.insert(END, text0, ("bold",))
-        addTagGroup(info, "Copyright", text1)
-        addTagGroup(info, "Artist", text2)
-        addTagGroup(info, "Characters", text3)
-        addTagGroup(info, "Tags", text4)
-        addTagGroup(info, "Meta", text5)
-        
-        bfont = Font(family="Helvetica", size=10, weight="bold")  # TODO make global?      
-        info.tag_configure("bold", font=bfont)
-        
-        icText = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
-        imageCount.config(text=icText)
     
     # the containing folder is the last three digits of the image id
     # e.g. image "12345678" is in folder "0678". Notice the leading zero;
@@ -123,7 +96,39 @@ def update_image(imageOnly):
     except Exception as e:
         clearImage(True)
         print(e)
-        return
+#        return
+
+    if not imageOnly:
+        tags = db.getTagsForImage2(which)
+
+        # tuples of form (category,name) -> dict[category]
+        tagDict = dict((k,[v[1] for v in itr]) for k,itr in groupby(tags, itemgetter(0)))
+
+        bytes = os.path.getsize(imagePath)
+        text0 = '{0}.{1}'.format(which,ext[0])
+        text01 = '\nSize: {2}K ({0}x{1})'.format(iw,ih,int(bytes/1024))
+        text02 = '\nRating: {0}\n'.format(db.getRatingForImage(which))
+        text1 = formatTagGroup(tagDict, 3)
+        text2 = formatTagGroup(tagDict, 1)
+        text3 = formatTagGroup(tagDict, 4)
+        text4 = formatTagGroup(tagDict, 0)
+        text5 = formatTagGroup(tagDict, 5)
+    
+        info.delete(1.0,END)
+        info.insert(END, text0, ("bold",))
+        info.insert(END, text01)
+        info.insert(END, text02)
+        addTagGroup(info, "Copyright", text1)
+        addTagGroup(info, "Artist", text2)
+        addTagGroup(info, "Characters", text3)
+        addTagGroup(info, "Tags", text4)
+        addTagGroup(info, "Meta", text5)
+        
+        bfont = Font(family="Helvetica", size=10, weight="bold")  # TODO make global?      
+        info.tag_configure("bold", font=bfont)
+        
+        icText = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
+        imageCount.config(text=icText)
 
 def firstImage():
     global image_ids
