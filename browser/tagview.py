@@ -125,6 +125,12 @@ def update_image(imageOnly):
         print(e)
         return
 
+def firstImage():
+    global image_ids
+    global image_index
+    image_index = 0
+    update_image(False)
+    
 def nextImage():
     global image_ids
     global image_index
@@ -172,6 +178,7 @@ def filterCall2():
     image_ids = db.getImagesForTags2(postsFilter.TagFilter1(), \
                                     postsFilter.TagFilter2(), \
                                     postsFilter.TagFilter3(), \
+                                    postsFilter.TagFilter4(), \
                                     postsFilter.RatingFilter())
     image_index = 0
     update_image(False)    
@@ -183,6 +190,8 @@ def keypress(event):
         nextImage()
     if (event.keysym == 'Prior'):
         prevImage()
+    if (event.keysym == 'Home'):
+        firstImage()
     
 tk_root = tk.Tk()
 tk_root.title("Danbooru Tag Browser")
