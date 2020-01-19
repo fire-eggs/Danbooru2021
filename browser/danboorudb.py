@@ -102,7 +102,7 @@ class DanbooruDB:
             tag2 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name like ?)'
             if (tFilter[0] == 'OR'):
                 op = ' UNION '
-            if (tFilter[0] == 'AND' or filter2[0] == ''):
+            if (tFilter[0] == 'AND' or tFilter[0] == ''):
                 op = ' INTERSECT '
             if (tFilter[1] == 'NOT'):
                 op = ' EXCEPT '
