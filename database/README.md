@@ -1,3 +1,4 @@
+NOTE: the database is in flux right now (January 2020) as I update to the 2019 dataset.
 
 ### makedb.py
 
