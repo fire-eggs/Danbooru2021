@@ -8,3 +8,6 @@ See:
 https://www.gwern.net/Danbooru2019
 
 For more details, view the readme file in each folder.
+
+This is partly an exercise to learn more about Tk and sqlite with Python. An anime enthusiast might appreciate
+using this as a private Danbooru service.
