@@ -56,3 +56,4 @@ Annotation courtesy of [Greenshot](https://getgreenshot.org/).
 - change "Delete" to "Hide"
 - add ability to include "hidden" images in the image set
 - tweak the 'look' of controls (e.g. add padding)
+- save and restore window sizes and positions
