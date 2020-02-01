@@ -42,6 +42,7 @@ the tag list window has been filtered to show all tags which start with the stri
 10. This entry allows you to filter images by their rating.
 11. Use this button to update the image set with your query and rating.
 12. Use this button to reset the query to empty.
+13. (Not shown). Minimizing the image window will minimize the two filter windows as well.
 
 Annotation courtesy of [Greenshot](https://getgreenshot.org/).
 
