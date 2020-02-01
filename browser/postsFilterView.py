@@ -29,6 +29,7 @@ class PostsFilter(Frame):
         self.ctrls1,self.vars1 = self.makeTagControls(parent,True)
         self.ctrls2,self.vars2 = self.makeTagControls(parent,False)
         self.ctrls3,self.vars3 = self.makeTagControls(parent,False)
+        self.ctrls4,self.vars4 = self.makeTagControls(parent,False)
 
         # Image rating
         self.ratingFilter = IntVar()
@@ -53,8 +54,12 @@ class PostsFilter(Frame):
         self.ctrls3[1].grid(column=2,row=2)
         self.ctrls3[2].grid(column=0,row=2)
 
-        rateBtn.grid(column=0, row=3)
-        rateCmb.grid(column=1, row=3, columnspan=2)
+        self.ctrls4[0].grid(column=1,row=3)
+        self.ctrls4[1].grid(column=2,row=3)
+        self.ctrls4[2].grid(column=0,row=3)
+
+        rateBtn.grid(column=0, row=4)
+        rateCmb.grid(column=1, row=4, columnspan=2)
 
         doitBtn.grid (column=0, row=5)
         clearBtn.grid(column=2, row=5)
@@ -79,6 +84,11 @@ class PostsFilter(Frame):
                 ('' if self.vars3[0].get() == 0 else "NOT"),
                self.vars3[1].get())
 
+    def TagFilter4(self):
+        return (self.vars4[2].get(),
+                ('' if self.vars4[0].get() == 0 else "NOT"),
+               self.vars4[1].get())
+
     def wipeit(self):
         self.vars1[0].set(0)
         self.vars1[1].set('')
@@ -89,6 +99,9 @@ class PostsFilter(Frame):
         self.vars3[0].set(0)
         self.vars3[1].set('')
         self.vars3[2].set('')
+        self.vars4[0].set(0)
+        self.vars4[1].set('')
+        self.vars4[2].set('')
         
     def minimize(self):
         self.master.withdraw()

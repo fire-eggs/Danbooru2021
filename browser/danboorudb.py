@@ -110,7 +110,7 @@ class DanbooruDB:
             val = tFilter[2]
         return res, val
     
-    def getImagesForTags2(self, filter1, filter2, filter3, rating):
+    def getImagesForTags2(self, filter1, filter2, filter3, filter4, rating):
         params = []
         start = 'select image_id from images where user_delete=0 '
         if rating != '':
@@ -122,15 +122,18 @@ class DanbooruDB:
 
         tag2, param2 = self.tagSubClause(filter2)
         tag3, param3 = self.tagSubClause(filter3)
+        tag4, param4 = self.tagSubClause(filter4)
 
-        full = start + '(' + tag1 + tag2 + tag3 + ') order by image_id'
+        full = start + '(' + tag1 + tag2 + tag3 + tag4 + ') order by image_id'
         if (param2 != ''):
             params.append(param2)
             if (param3 != ''):
                 params.append(param3)
+                if (param4 != ''):
+                    params.append(param4)
         
-        print(full)
-        print(tuple(params))
+        #print(full)
+        #print(tuple(params))
         self.cur.execute(full,params)
         res = self.cur.fetchall()
         return [i[0] for i in res]
