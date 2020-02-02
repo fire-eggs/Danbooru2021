@@ -1,6 +1,6 @@
 import sqlite3
 
-con = sqlite3.connect("danbooru2018_kbr.db")
+con = sqlite3.connect("danbooru2019.db")
 con.isolation_level = None
 cur = con.cursor()
 
@@ -20,7 +20,7 @@ while True:
             cur.execute(buffer)
 
             start = buffer.lstrip().upper()
-            if (start.startswith("SELECT") or start.startswith("EXPLAIN")):
+            if (start.startswith("SELECT") or start.startswith("EXPLAIN")): # allow explain query plan
                 res = cur.fetchall()
                 print(res)
         except sqlite3.Error as e:
