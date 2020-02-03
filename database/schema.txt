@@ -27,13 +27,15 @@ Table images as I {
   is_deleted INT
   updated_at TEXT
   is_banned INT
-  pixiv_id INT  
+  pixiv_id INT
+  hidden INT  
 }
 
 Table tags as T {
   tag_id int [pk]
   name text
   category int
+  count int
 }
 
 Table imageTags as IT {
@@ -41,11 +43,5 @@ Table imageTags as IT {
   tag_id int
 }
 
-Table favs as F {
-  image_id int
-  faver_id text
-}
-
 Ref: IT.image_id > I.image_id
 Ref: IT.tag_id > T.tag_id
-Ref: F.image_id > I.image_id

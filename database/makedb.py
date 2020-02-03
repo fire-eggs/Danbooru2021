@@ -2,9 +2,9 @@
 # Modified slightly for db2019:
 # - do not track danbooru favorites
 # - do not track danbooru pools
-# - change 'user_delete' to 'deletion'
+# - change 'user_delete' to 'hidden'
 #
-# The 'deletion' column is used to "hide" files from the browser. It is a set
+# The 'hidden' column is used to hide files from the browser. It is a set
 # of flags, with the current values:
 # 0 : not hidden
 # 1 : user has marked as hidden
@@ -13,12 +13,6 @@
 # 8 : file is an 'effective' duplication of another file [different in size/encoding]
 # 16: file is not an image (rar,zip,swf,mp4,webm,mpg,etc)
 #
-# select I.image_id,I.created_at,I.score,I.source,I.rating,I.image_width,I.image_height,I.file_size
-# from images I
-# join imageTags IT on I.image_id = IT.image_id
-# join tags T on IT.tag_id = T.tag_id
-# where T.name = 'touhou'
-# order by I.image_id
 
 import sqlite3
 import json
@@ -90,7 +84,7 @@ def main():
                   updated_at TEXT,
                   is_banned INT,
                   pixiv_id INT,
-                  deletion INT DEFAULT 0)''')
+                  hidden INT DEFAULT 0)''')
 
     # tags
     c.execute('''CREATE TABLE tags
@@ -133,7 +127,7 @@ def main():
     c.execute('CREATE INDEX image_tags on imageTags(tag_id)')
     # useful index for looking up image by rating
     c.execute('CREATE INDEX image_rate on images(image_id,rating)')
-    c.execute('CREATE INDEX image_del on images(image_id,deletion)')
+    c.execute('CREATE INDEX image_hide on images(image_id,hidden)')
     
     
     for json_file in os.listdir(DATA_DIR):
@@ -185,12 +179,23 @@ def main():
         
         conn.commit()
 
+    #add a count of each tag to the tag table
+    c.execute("alter table tags add count int default 0")
+    c.execute("""update tags set count=
+                 (select count(image_id) from imagetags where imagetags.tag_id=tags.tag_id) 
+                  where exists 
+                  (select * from imagetags where imagetags.tag_id = tags.tag_id)""")
+    conn.commit()
+    
     conn.close()
 
 if __name__ == "__main__":
     main()
 
-#add a count of each tag to the tag table
-#update tags add count int default 0;
-#update tags set count=(select count(image_id) from imagetags where imagetags.tag_id=tags.tag_id) 
-#where exists (select * from imagetags where imagetags.tag_id = tags.tag_id);
+
+# select I.image_id,I.created_at,I.score,I.source,I.rating,I.image_width,I.image_height,I.file_size
+# from images I
+# join imageTags IT on I.image_id = IT.image_id
+# join tags T on IT.tag_id = T.tag_id
+# where T.name = 'touhou'
+# order by I.image_id

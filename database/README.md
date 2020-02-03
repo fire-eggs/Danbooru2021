@@ -43,4 +43,6 @@ file. Marks metadata rows with missing images as `user_delete=2` (see above).
 
 ### The Schema
 
+Diagram manually created via dbdiagram.io/d
+
 ![database schema](schema.png)
