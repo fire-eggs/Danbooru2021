@@ -12,8 +12,8 @@ The browser is a simple Tkinter interface and may be run on any platform with Py
 database as defined by the database project in this repository.
 
 To use:
-1. The program assumes the database (`danbooru2018.py`) is in the application folder.
-2. Edit the `IMAGES_BASE` value in `tagview.py` to the path of the image set (e.g. `G:\danbooru2018\original`).
+1. The program assumes the database (`danbooru2019.py`) is in the application folder. You can change this in `tagview.py`.
+2. Edit the `IMAGES_BASE` value in `tagview.py` to the path of the image set (e.g. `G:\danbooru2019\original`).
 3. Execute `python tagview.py`
 
 ### Screen Cap as of 20200118
