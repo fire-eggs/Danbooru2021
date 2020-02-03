@@ -2,19 +2,15 @@ import sqlite3
 
 class DanbooruDB:
     def __init__(self):
-        self.conn = sqlite3.connect("danbooru2018_kbr.db")
+        self.conn = sqlite3.connect("../danbooru2019.db")
         self.conn.isolation_level = None
         self.cur = self.conn.cursor()
 
         self.catDict={'a':1,'c':4,'d':0,'m':5,'s':3}
 
     def getImageIdsForTag(self,tag_name):
-        # self.cur.execute('''select image_id from imageTags 
-                            # where tag_id= (select tag_id from tags where name=?)
-                            # order by image_id''',tag_name)
-                            
         self.cur.execute('''select image_id from images
-                            where user_delete = 0 and image_id in 
+                            where hidden = 0 and image_id in 
                             (select image_id from imageTags where tag_id in 
                                 (select tag_id from tags where name=?)
                             ) order by image_id ''', tag_name)
@@ -53,7 +49,7 @@ class DanbooruDB:
 
         # annoying, this variant is faster than join
         self.cur.execute('''select image_id from images
-                            where user_delete = 0 and rating=? and image_id in 
+                            where hidden = 0 and rating=? and image_id in 
                             (select image_id from imageTags where tag_id in 
                                 (select tag_id from tags where name=?)
                             ) order by image_id ''', params)
@@ -68,8 +64,10 @@ class DanbooruDB:
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of ids
         
-    def markAsDelete(self,image_id):
-        self.cur.execute('update images set user_delete=1 where image_id=?',(image_id,))
+    def markAsHidden(self,image_id):
+        self.cur.execute("select hidden from images where image_id=?",(image_id,))
+        val = (self.cur.fetchall()[0])[0] | 1
+        self.cur.execute('update images set hidden=? where image_id=?',(val,image_id))
         
     def getTagsForImage(self,image_id):
         self.cur.execute('''select name from tags where tag_id in 
@@ -112,7 +110,7 @@ class DanbooruDB:
     
     def getImagesForTags2(self, filter1, filter2, filter3, filter4, rating):
         params = []
-        start = 'select image_id from images where user_delete=0 '
+        start = 'select image_id from images where hidden=0 '
         if rating != '':
             params.append(rating.lower())
             start += 'and rating=? '

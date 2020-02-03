@@ -13,6 +13,9 @@ from operator import itemgetter
 from itertools import groupby
 from tkinter.font import Font
 
+import _thread, queue, time
+dataQueue = queue.Queue()
+
 IMAGES_BASE = 'G:\\original\\'
 image_ids = ()
 image_index = -1
@@ -152,7 +155,7 @@ def prevImage():
         image_index = len(image_ids) - 1
     update_image(False)
 
-def delImage():
+def hideImage():
     global image_ids
     global image_index
     try:
@@ -161,32 +164,76 @@ def delImage():
         # no images satisfy tag / filters
         clearImage(True)
         return
-    db.markAsDelete(which)
+    db.markAsHidden(which)
     nextImage()
+
+def spinup():
+    # make sure the image drive is spun up
+    imagePath = os.path.join(IMAGES_BASE, "0000", "1000.png")
+    im = pil.Image.open(imagePath)
     
-def filterCall(tag):
+def producer(which):
+    # TODO consider re-doing as paged query
+    # need separate db instance because it cannot be used across threads
+    if (which == 1):
+        image_ids = DanbooruDB().getImageIdsForTag2(_tag,postsFilter.RatingFilter())
+    if (which == 2):
+        image_ids = DanbooruDB().getImagesForTags2(postsFilter.TagFilter1(), \
+                                        postsFilter.TagFilter2(), \
+                                        postsFilter.TagFilter3(), \
+                                        postsFilter.TagFilter4(), \
+                                        postsFilter.RatingFilter())
+    dataQueue.put(image_ids)        
+
+# data queue consumer - looks for updates to the image_id list
+# runs in separate thread so the GUI is responsive
+def consumer(root):
     global image_ids
     global image_index
     
-    image_ids = db.getImageIdsForTag2(tag,postsFilter.RatingFilter())
-    image_index = 0
-    # TODO handle scenario where zero image ids
-    update_image(False)   
+    try:
+        data = dataQueue.get(block=False)
+    except queue.Empty:
+        pass
+    else:
+        image_ids = data
+        image_index = 0
+        update_image(False)
+    root.after(500, consumer, root)
+        
+def filterCall(tag):
+    global image_ids
+    global image_index
+    global _tag
+
+    _thread.start_new_thread(spinup, ())
+    image_index = -1
+    image_ids=()
+    clearImage(False)
+    _tag = tag
+    _thread.start_new_thread(producer, (1,))
+    
+##    image_ids = db.getImageIdsForTag2(tag,postsFilter.RatingFilter())
+##    image_index = 0
+##    # TODO handle scenario where zero image ids
+##    update_image(False)   
 
 def filterCall2():
     global image_ids
     global image_index
     
+    _thread.start_new_thread(spinup, ())
     image_index = -1
     image_ids=()
     clearImage(False)
-    image_ids = db.getImagesForTags2(postsFilter.TagFilter1(), \
-                                    postsFilter.TagFilter2(), \
-                                    postsFilter.TagFilter3(), \
-                                    postsFilter.TagFilter4(), \
-                                    postsFilter.RatingFilter())
-    image_index = 0
-    update_image(False)    
+    _thread.start_new_thread(producer, (2,))
+##    image_ids = db.getImagesForTags2(postsFilter.TagFilter1(), \
+##                                    postsFilter.TagFilter2(), \
+##                                    postsFilter.TagFilter3(), \
+##                                    postsFilter.TagFilter4(), \
+##                                    postsFilter.RatingFilter())
+##    image_index = 0
+##    update_image(False)    
 
 def keypress(event):
     args = event.keysym, event.keycode, event.char 
@@ -225,7 +272,7 @@ pict.bind("<Configure>", pictresize)
 imageCount=Label(tk_root,text=' ', justify=RIGHT)
 btnPrev = Button(tk_root, text='Prev', command=prevImage)
 btnNext = Button(tk_root, text='Next', command=nextImage)
-btnDel  = Button(tk_root, text='Delete', command=delImage)
+btnDel  = Button(tk_root, text='Hide', command=hideImage)
 
 pict.grid(row=0,column=2,sticky=NSEW,rowspan=4)
 info.grid(row=0,column=0,columnspan=2,sticky=NSEW)
@@ -246,5 +293,7 @@ tk_root.bind("<Map>", restoreEvent)
 db = DanbooruDB()
 filterClass = FilterView(Toplevel(), filterCall, db)
 postsFilter = PostsFilter(Toplevel(), filterCall2)
+_tag = ''
 
+consumer(tk_root)
 tk_root.mainloop()
