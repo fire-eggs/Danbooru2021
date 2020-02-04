@@ -11,3 +11,15 @@ For more details, view the readme file in each folder.
 
 This is partly an exercise to learn more about Tk and sqlite with Python. An anime enthusiast might appreciate
 using this as a private Danbooru service.
+
+### Numbers
+
+As of February 4, 2020, here are file counts:
+
+|Group|Count|
+|--|--|
+|Visible|3,668,908|
+|Missing|    12,269|
+|Duplicated| 10,530|
+|Non-image|  10,426|
+

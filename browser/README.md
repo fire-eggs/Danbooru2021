@@ -1,9 +1,6 @@
 
 A "browser" for viewing images associated with tags.
 
-```diff
--NOTE: the database and feature set is in flux right now (February 2020) as I update to the 2019 dataset.
-```
 The set of images to view can be searched / filtered in two ways:
 1. Selecting a single tag from a list of tags. The list of tags may be searched with wildcards and by category.
 2. Using boolean query (AND, NOT, OR) to find images which match a combination of tags.
@@ -15,8 +12,8 @@ The browser is a simple Tkinter interface and may be run on any platform with Py
 database as defined by the database project in this repository.
 
 To use:
-1. The program assumes the database (`danbooru2018.py`) is in the application folder.
-2. Edit the `IMAGES_BASE` value in `tagview.py` to the path of the image set (e.g. `G:\danbooru2018\original`).
+1. The program assumes the database (`danbooru2019.py`) is in the application folder. You can change this in `tagview.py`.
+2. Edit the `IMAGES_BASE` value in `tagview.py` to the path of the image set (e.g. `G:\danbooru2019\original`).
 3. Execute `python tagview.py`
 
 ### Screen Cap as of 20200118
@@ -30,7 +27,8 @@ the tag list window has been filtered to show all tags which start with the stri
 2. Shows tags and other details about the current image.
 3. The count and position of the current image in the image set.
 4. Buttons to navigate within the image set. The PageUp, PageDn and Home keys are handled as well.
-5. Mark the current image as "hidden" in the database. "Hiding" an image will prevent it from appearing in future sets.
+5. Mark the current image as "hidden" in the database. "Hiding" an image will prevent it from appearing in future sets. **Note**: 
+the current code labels this button as "Hide", not "Delete".
 6. The filter window. This entry allows you to filter by the tag name. Wildcards are currently
    using database syntax (i.e. '%' is wildcard, not '*').
 7. This entry allows you to filter tags by their Danbooru category (artist, character, etc).
@@ -46,7 +44,8 @@ the tag list window has been filtered to show all tags which start with the stri
 
 Annotation courtesy of [Greenshot](https://getgreenshot.org/).
 
-#### TODO (as of 20200118):
+#### TODO (as of 20200203):
+- improve perceived performance, especially for "large" image sets
 - view more than the first 100 tags
 - full-size scrollable image view (when image is very large)
 - ability to generate a file containing the paths to all images in the current set
@@ -54,7 +53,6 @@ Annotation courtesy of [Greenshot](https://getgreenshot.org/).
 - ability to add / remove more boolean clauses
 - querying with boolean clauses can be quite slow. Do something to improve perceived performance.
 - add ability to create "favorite" groups and mark an image as such (i.e. personal pools).
-- change "Delete" to "Hide"
 - add ability to include "hidden" images in the image set
 - tweak the 'look' of controls (e.g. add padding)
 - save and restore window sizes and positions
