@@ -39,7 +39,9 @@ while True:
         if len(res1) == 0 and len(res2)==0:
             print(which)
             # mark the image as 'missing' in the database
-            cur.execute('update images set hidden=2 where image_id=?',(id,))
+            cur.execute("select hidden from images where image_id=?",(id,))
+            val = cur.fetchall()[0][0]
+            cur.execute('update images set hidden=? where image_id=?',((val | 2),id))
         
     last = res[len(res)-1][0]
     print("#-" + str(last))
