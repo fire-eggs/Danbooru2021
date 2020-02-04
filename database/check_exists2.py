@@ -18,12 +18,14 @@ last = 0
 
 # process images in batches of 10000
 while True:
-    cur.execute('select image_id from images where image_id > ? order by image_id limit 10000',(last,))
+    cur.execute('select image_id,file_ext from images where image_id > ? order by image_id limit 10000',(last,))
     res = cur.fetchall()
     if len(res) == 0: # no more, we're done
         exit()
     
-    for id in [i[0] for i in res]:
+    for tup in res:
+        id = tup[0]
+        ext = tup[1]
         which = str(id)
         
         # will be contained in a folder modulus 1000, with leading zeros
@@ -31,17 +33,16 @@ while True:
         while (len(fold) < 4):
             fold = '0' + fold
 
-        # TODO this may be a slow variant of exists(), is there a faster way?
-        imagePath = os.path.join(base,fold,which + ".*")
-        res1 = glob.glob(imagePath)
-        imagePath2 = os.path.join(base2,fold,which + ".*")
-        res2 = glob.glob(imagePath2)
-        if len(res1) == 0 and len(res2)==0:
-            print(which)
-            # mark the image as 'missing' in the database
-            cur.execute("select hidden from images where image_id=?",(id,))
-            val = cur.fetchall()[0][0]
-            cur.execute('update images set hidden=? where image_id=?',((val | 2),id))
+        imagePath = os.path.join(base,fold,which + "." + ext)
+        if not os.path.isfile(imagePath):
+            imagePath2 = os.path.join(base2,fold,which + "." + ext)
+            if not os.path.isfile(imagePath2):
+                print(which)
+                # TODO replace with "update images set hidden=(select hidden from images where image_id=1) | 2 where image_id=1"
+                # mark the image as 'missing' in the database
+                cur.execute("select hidden from images where image_id=?",(id,))
+                val = cur.fetchall()[0][0]
+                cur.execute('update images set hidden=? where image_id=?',((val | 2),id))
         
     last = res[len(res)-1][0]
     print("#-" + str(last))
