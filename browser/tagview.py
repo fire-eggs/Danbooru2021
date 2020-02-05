@@ -20,15 +20,17 @@ IMAGES_BASE = 'G:\\original\\'
 image_ids = ()
 image_index = -1
 
+master_image = None
+
 def clearImage(fault):
-    #info.config(text="")
     info.delete(1.0,END)
+    pict.delete("all")
+    
     if fault:
-        pict.config(image='', bg="#FF0000")
+        pict.config(bg="#FF0000")
     else:
-        pict.config(image='', bg="#FFFFFF")
+        pict.config(bg="#EFF4F7")
         imageCount.config(text="")
-    pict.image=None
         
 def pictresize(event):
     update_image(True)
@@ -48,6 +50,7 @@ def addTagGroup(info, head, text):
 def update_image(imageOnly):
     global image_ids
     global image_index
+    global master_image
     
     if image_index < 0:
         clearImage(False)
@@ -71,7 +74,8 @@ def update_image(imageOnly):
         
     imagePath = os.path.join(IMAGES_BASE, fold, str(which) + "." + ext[0])
     try:       
-        im = pil.Image.open(imagePath)
+        # images in LA mode were not handled nicely [see image 715723]
+        im = pil.Image.open(imagePath).convert('RGBA')
         
         # resize image to output widget, preserving aspect ratio
         pw = pict.winfo_width()  - 4
@@ -80,6 +84,7 @@ def update_image(imageOnly):
         #print("Pict:({0},{1})".format(pw,ph))
         iw,ih = im.size
         newW,newH = im.size
+        
         #print("Imag:({0},{1})".format(iw,ih))
         im2 = im
 
@@ -89,17 +94,18 @@ def update_image(imageOnly):
             r =  min(rw, rh)
             newH = int(ih * r)
             newW = int(iw * r)
-                    
-        im2 = im.resize((newW, newH))
+            im2 = im.resize((newW, newH))
+            
         #print("New:({0},{1})".format(newW,newH))
-                    
-        img = pil.ImageTk.PhotoImage(im2)
-        pict.config(image=img, bg= "#EFF4F7") #, width=pw, height=ph)
-        pict.image = img
+
+        # for canvas: use a global because otherwise the local copy would be garbage collected
+        master_image = pil.ImageTk.PhotoImage(im2)
+        
+        pict.delete("all") # clear the previous image
+        item = pict.create_image(2, 2, image=master_image, anchor=NW)
     except Exception as e:
-        clearImage(True)
         print(e)
-#        return
+        clearImage(True)
 
     if not imageOnly:
         tags = db.getTagsForImage2(which)
@@ -132,7 +138,7 @@ def update_image(imageOnly):
         
         icText = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
         imageCount.config(text=icText)
-
+    
 def firstImage():
     global image_ids
     global image_index
@@ -265,7 +271,7 @@ tk_root.minsize(600,400)
 
 # Image info box
 info=tkst.ScrolledText(tk_root,width=30)
-pict=Label(tk_root, text=' ',relief=SUNKEN)
+pict=Canvas(tk_root,bg="white",width=400,height=400,relief=SUNKEN)
 pict.bind("<Configure>", pictresize)
 
 # image count and buttons

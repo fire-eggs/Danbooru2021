@@ -65,6 +65,7 @@ class DanbooruDB:
         return [i[0] for i in res] # list of tuples to list of ids
         
     def markAsHidden(self,image_id):
+        # TODO replace with "update images set hidden=(select hidden from images where image_id=1) | 2 where image_id=1"
         self.cur.execute("select hidden from images where image_id=?",(image_id,))
         val = (self.cur.fetchall()[0])[0] | 1
         self.cur.execute('update images set hidden=? where image_id=?',(val,image_id))
