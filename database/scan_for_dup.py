@@ -1,7 +1,7 @@
 # determine if 'duplicate' files exist based on the file *name* (not extension)
 # needed to identify .GIF and .PNG duplication
 #
-# For unknown reasons, Gwent's fileset contains a few PNG files which are
+# For unknown reasons, Gwern's fileset contains a few PNG files which are
 # duplicates of other GIF files. The GIF files are the ones in the metadata.
 #
 import os

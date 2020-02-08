@@ -6,7 +6,7 @@
 # will be missing a "file_url" value.
 #
 # Files are downloaded to a folder structure that matches
-# Gwent's structure (in the current directory).
+# Gwern's structure (in the current directory).
 #
 # For politeness, there is a one minute delay after downloading
 # a file.

@@ -142,7 +142,7 @@ def main():
             json_line = json.loads(raw_json_line)
             image_id = json_line["id"]
 
-            # KBR Qwent's 2019 fileset stops at 3734659 - don't record metadata
+            # KBR Gwern's 2019 fileset stops at 3734659 - don't record metadata
             # beyond that value
             if (int)(image_id) > 3734659:
                 continue;
