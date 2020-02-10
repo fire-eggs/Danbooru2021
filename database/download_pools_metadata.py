@@ -18,17 +18,17 @@ conn = sqlite3.connect("danbooru2019.db")
 c = conn.cursor()
 
 # all unprocessed pools. Assumes nothing has been processed
-last = 1784
+last = 0
 c.execute("select pool_id from pools where pool_id > ?",(last,))
 pool_ids = [i[0] for i in c.fetchall()]
 
 # split pool_ids into slices of 10
 
 for i in range(0, len(pool_ids), 10):
-    print(i)
     ids = pool_ids[i:i+10]
     id_str = ",".join([str(x) for x in ids])
-
+    print(id_str)
+    
     url = base + id_str
     response = requests.get(url)
     if response.status_code != 200:
