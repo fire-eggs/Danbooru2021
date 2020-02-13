@@ -13,7 +13,7 @@ class DanbooruDB:
                             where hidden = 0 and image_id in 
                             (select image_id from imageTags where tag_id in 
                                 (select tag_id from tags where name=?)
-                            ) order by image_id ''', tag_name)
+                            ) order by image_id ''', (tag_name,))
                             
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of ids
@@ -42,6 +42,22 @@ class DanbooruDB:
         self.cur.execute('select name from tags where name like ? and category = ? order by name', params)
         return self.cur.fetchall()
         
+    def get_tags_and_counts1(self):
+        self.cur.execute("select name,count from tags order by name limit 1000")
+        return self.cur.fetchall()
+        
+    def get_tags_and_counts2(self, filter):
+        if (filter == ''):
+            return self.get_tags_and_counts1()
+        self.cur.execute("select name,count from tags where name like ? order by name", (filter,))
+        return self.cur.fetchall()
+        
+    def get_tags_and_counts(self, filter, cat):
+        if (cat == ''):
+            return self.get_tags_and_counts2(filter)
+        self.cur.execute("select name,count from tags where name like ? and category=? order by name", (filter,cat))
+        return self.cur.fetchall()
+                
     def getImageIdsForTag2(self,tag_name,rating):
         if rating=='':
             return self.getImageIdsForTag(tag_name)
