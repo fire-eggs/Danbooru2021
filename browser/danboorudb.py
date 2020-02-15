@@ -55,7 +55,8 @@ class DanbooruDB:
     def get_tags_and_counts(self, filter, cat):
         if (cat == ''):
             return self.get_tags_and_counts2(filter)
-        self.cur.execute("select name,count from tags where name like ? and category=? order by name", (filter,cat))
+        params = (filter, self.catDict[cat.lower()])            
+        self.cur.execute("select name,count from tags where name like ? and category=? order by name", params)
         return self.cur.fetchall()
                 
     def getImageIdsForTag2(self,tag_name,rating):
