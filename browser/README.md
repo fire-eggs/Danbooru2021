@@ -8,7 +8,7 @@ The set of images to view can be searched / filtered in two ways:
 When a set of images has been specified, the first image (and details) is shown. You may then cycle through all
 the images in the set.
 
-The browser is a simple Tkinter interface and may be run on any platform with Python 3 installed. Uses the sqlite 
+The browser is a simple Tkinter interface and may be run on any platform with Python 3 and Tk installed. Uses the sqlite 
 database as defined by the database project in this repository.
 
 To use:
@@ -45,10 +45,11 @@ the current code labels this button as "Hide", not "Delete".
 Annotation courtesy of [Greenshot](https://getgreenshot.org/).
 
 #### TODO (as of 20200203):
-- improve perceived performance, especially for "large" image sets
+Updated 20200901:
+- ~improve perceived performance, especially for "large" image sets~
 - view more than the first 100 tags
 - full-size scrollable image view (when image is very large)
-- ability to generate a file containing the paths to all images in the current set
+- ~ability to generate a file containing the paths to all images in the current set~
 - animate GIF and APNG
 - ability to add / remove more boolean clauses
 - querying with boolean clauses can be quite slow. Do something to improve perceived performance.
