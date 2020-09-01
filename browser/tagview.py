@@ -12,6 +12,7 @@ from collections import defaultdict
 from operator import itemgetter
 from itertools import groupby
 from tkinter.font import Font
+from tkinter.filedialog import asksaveasfilename
 
 import _thread, queue, time
 dataQueue = queue.Queue()
@@ -178,6 +179,26 @@ def hideImage():
     db.markAsHidden(which)
     nextImage()
 
+def makeFileList():
+    global image_ids
+    
+    # prompt user for destination file
+    # output all file paths to said file
+    filetypes = [('Text', '*.txt'),('All files','*.*')]
+    outfilename = asksaveasfilename(filetypes=filetypes)
+    if outfilename is None or outfilename == "":
+        return
+    
+    with open(outfilename, "w") as outfile:
+        last = 0
+        keepgoing = True
+        while keepgoing:
+            extset = db.getPagedExtForImages(image_ids,last)
+            last += len(extset)
+            keepgoing = len(extset) > 0
+            for pair in extset:
+                outfile.write(getFilePath(pair[0],pair[1]) + "\n")
+    
 def spinup():
     # make sure the image drive is spun up
     imagePath = os.path.join(IMAGES_BASE, "0000", "1000.png")
@@ -284,18 +305,20 @@ imageCount=Label(tk_root,text=' ', justify=RIGHT)
 btnPrev = Button(tk_root, text='Prev', command=prevImage)
 btnNext = Button(tk_root, text='Next', command=nextImage)
 btnDel  = Button(tk_root, text='Hide', command=hideImage)
+btnFile = Button(tk_root, text='To File', command=makeFileList)
 
-pict.grid(row=0,column=2,sticky=NSEW,rowspan=4)
-info.grid(row=0,column=0,columnspan=2,sticky=NSEW)
+pict.grid(row=0,column=3,sticky=NSEW,rowspan=4)
+info.grid(row=0,column=0,columnspan=3,sticky=NSEW)
 imageCount.grid(row=1,column=0,sticky=E)
 btnPrev.grid(row=2,column=0,sticky=E)
 btnNext.grid(row=2,column=1,sticky=W)
 btnDel.grid(row=3,column=0,sticky=W)
+btnFile.grid(row=3,column=2,sticky=E)
 
 tk_root.rowconfigure(0, weight=1)
 tk_root.columnconfigure(0, minsize=150, weight=0)
 tk_root.columnconfigure(1, weight=0)
-tk_root.columnconfigure(2, weight=1)
+tk_root.columnconfigure(3, weight=1)
 
 tk_root.bind("<Key>", keypress)
 tk_root.bind("<Unmap>", minEvent)
