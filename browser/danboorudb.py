@@ -12,7 +12,7 @@ class DanbooruDB:
         self.cur.execute('''select image_id from images
                             where hidden = 0 and image_id in 
                             (select image_id from imageTags where tag_id in 
-                                (select tag_id from tags where name=?)
+                                (select tag_id from tags where name like ?)
                             ) order by image_id ''', (tag_name,))
                             
         res = self.cur.fetchall()
@@ -68,7 +68,7 @@ class DanbooruDB:
         self.cur.execute('''select image_id from images
                             where hidden = 0 and rating=? and image_id in 
                             (select image_id from imageTags where tag_id in 
-                                (select tag_id from tags where name=?)
+                                (select tag_id from tags where name like ?)
                             ) order by image_id ''', params)
                             
         #params = (tag_name[0],rating.lower())
