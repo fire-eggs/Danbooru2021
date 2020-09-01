@@ -46,6 +46,18 @@ def addTagGroup(info, head, text):
         info.insert(END, head+":", ("bold",))
         info.insert(END, "\n")
         info.insert(END, text)
+
+def getFilePath(image_id, ext):
+
+    # the containing folder is the last three digits of the image id
+    # e.g. image "12345678" is in folder "0678". Notice the leading zero;
+    # all folder names are four digits wide with leading zeros.
+    fold ='0' + str(image_id)[-3:]
+    while (len(fold) < 4):
+        fold = '0' + fold
+        
+    imagePath = os.path.join(IMAGES_BASE, fold, str(image_id) + "." + ext)
+    return imagePath
     
 def update_image(imageOnly):
     global image_ids
@@ -64,15 +76,8 @@ def update_image(imageOnly):
         return
 
     ext = db.getExtForImage(which)
+    imagePath = getFilePath(image_ids[image_index], ext[0])
     
-    # the containing folder is the last three digits of the image id
-    # e.g. image "12345678" is in folder "0678". Notice the leading zero;
-    # all folder names are four digits wide with leading zeros.
-    fold ='0' + str(image_ids[image_index])[-3:]
-    while (len(fold) < 4):
-        fold = '0' + fold
-        
-    imagePath = os.path.join(IMAGES_BASE, fold, str(which) + "." + ext[0])
     try:       
         # images in LA mode were not handled nicely [see image 715723]
         im = pil.Image.open(imagePath).convert('RGBA')
