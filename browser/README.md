@@ -40,7 +40,8 @@ the current code labels this button as "Hide", not "Delete".
 10. This entry allows you to filter images by their rating.
 11. Use this button to update the image set with your query and rating.
 12. Use this button to reset the query to empty.
-13. (Not shown). Minimizing the image window will minimize the two filter windows as well.
+13. (Not shown). Minimizing the image window will minimize the two filter windows as well. [20200901: On Windows; doesn't seem to work on Linux.]
+14. (Not shown). Near to marker 4, the "To File" button will let you export the current set of image paths to a text file.
 
 Annotation courtesy of [Greenshot](https://getgreenshot.org/).
 
