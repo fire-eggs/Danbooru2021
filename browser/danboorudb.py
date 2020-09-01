@@ -153,3 +153,41 @@ class DanbooruDB:
         self.cur.execute(full,params)
         res = self.cur.fetchall()
         return [i[0] for i in res]
+        
+    def getPagedImagesForTag(self,tag_name,rating,last):
+        #
+        # Return image ids paged in groups of 100.
+        # Images must match the tag and optional rating.
+        #
+        #print("gpift:", tag_name, rating, str(last))
+        params = (tag_name,last)
+        rate_str = ""
+        if rating!='':
+            rate_str = " and rating=? "
+            params = params + (rating.lower(),)
+
+        # annoying, this variant is faster than join
+        #self.conn.set_trace_callback(print)
+        str1 = '''select image_id from images where image_id in 
+                   (select image_id from imageTags where tag_id in 
+                    (select tag_id from tags where name=?)
+                    and image_id > ? order by image_id) and hidden = 0'''
+        str2 = " limit 100"
+        self.cur.execute( str1 + rate_str + str2, params)
+        res = self.cur.fetchall()
+        #self.conn.set_trace_callback(None)
+        return [i[0] for i in res] # list of tuples to list of ids
+
+    def getPagedExtForImages(self,id_list,last):
+    
+        subset = id_list[last:last+1000]
+        if len(subset) == 0:
+            return []
+        
+        strval = ','.join([str(i) for i in subset])
+        query = "select image_id, file_ext from images where image_id in ({})".format(strval)
+        
+        self.cur.execute(query)
+        res = self.cur.fetchall()
+        return res
+        

@@ -14,12 +14,14 @@ from itertools import groupby
 from tkinter.font import Font
 from tkinter.filedialog import asksaveasfilename
 
-import _thread, queue, time
+
+import _thread, queue, time, threading
 dataQueue = queue.Queue()
 
 IMAGES_BASE = 'G:\\original\\'
-image_ids = ()
+image_ids = []
 image_index = -1
+_last = 0
 
 master_image = None
 
@@ -34,7 +36,8 @@ def clearImage(fault):
         imageCount.config(text="")
         
 def pictresize(event):
-    update_image(True)
+    # picture window being resized
+    update_image(False)
 
 def formatTagGroup(tagDict, cat):
     text = ""
@@ -65,8 +68,8 @@ def update_image(imageOnly):
     global image_index
     global master_image
     
+    clearImage(False)
     if image_index < 0:
-        clearImage(False)
         return
         
     try:
@@ -205,17 +208,28 @@ def spinup():
     im = pil.Image.open(imagePath)
     
 def producer(which):
-    # TODO consider re-doing as paged query
-    # need separate db instance because it cannot be used across threads
-    if (which == 1):
-        image_ids = DanbooruDB().getImageIdsForTag2(_tag,postsFilter.RatingFilter())
-    if (which == 2):
-        image_ids = DanbooruDB().getImagesForTags2(postsFilter.TagFilter1(), \
-                                        postsFilter.TagFilter2(), \
-                                        postsFilter.TagFilter3(), \
-                                        postsFilter.TagFilter4(), \
-                                        postsFilter.RatingFilter())
-    dataQueue.put(image_ids)        
+    global _last
+    global _tag
+
+    #print("Thread:{}".format(threading.current_thread().ident))
+
+    keepgoing = True
+    while keepgoing:
+        # need separate db instance because it cannot be used across threads
+        if (which == 1):
+            image_ids = DanbooruDB().getPagedImagesForTag(_tag,postsFilter.RatingFilter(),_last)
+            if len(image_ids) > 0:
+                _last = image_ids[-1]
+                #print("prod:", str(len(image_ids)), str(_last))
+            keepgoing = len(image_ids) > 0
+        if (which == 2):
+            image_ids = DanbooruDB().getImagesForTags2(postsFilter.TagFilter1(), \
+                                            postsFilter.TagFilter2(), \
+                                            postsFilter.TagFilter3(), \
+                                            postsFilter.TagFilter4(), \
+                                            postsFilter.RatingFilter())
+            keepgoing = False
+        dataQueue.put(image_ids)        
 
 # data queue consumer - looks for updates to the image_id list
 # runs in separate thread so the GUI is responsive
@@ -228,44 +242,45 @@ def consumer(root):
     except queue.Empty:
         pass
     else:
-        image_ids = data
-        image_index = 0
-        update_image(False)
-    root.after(500, consumer, root)
+        #print("Cons:", str(len(data)))
+        image_ids = image_ids + data
+        if image_index < 0:
+            # auto-show the first image on a new request
+            image_index = 0
+            update_image(False)
+    root.after(50, consumer, root)
         
 def filterCall(tag):
     global image_ids
     global image_index
     global _tag
+    global _last
 
+    # TODO Issue: multiple threads could be active - stop the existing one?
+    # TODO Issue: do we have a bunch of threads dangling? [one per query]
+    
     _thread.start_new_thread(spinup, ())
     image_index = -1
-    image_ids=()
+    image_ids=[]
     clearImage(False)
     _tag = tag
+    _last = 0
     _thread.start_new_thread(producer, (1,))
     
-##    image_ids = db.getImageIdsForTag2(tag,postsFilter.RatingFilter())
-##    image_index = 0
-##    # TODO handle scenario where zero image ids
-##    update_image(False)   
-
 def filterCall2():
     global image_ids
     global image_index
+    global _last
+
+    # TODO Issue: multiple threads could be active - stop the existing one?
+    # TODO Issue: do we have a bunch of threads dangling? [one per query]
     
     _thread.start_new_thread(spinup, ())
     image_index = -1
-    image_ids=()
+    image_ids=[]
     clearImage(False)
+    _last = 0
     _thread.start_new_thread(producer, (2,))
-##    image_ids = db.getImagesForTags2(postsFilter.TagFilter1(), \
-##                                    postsFilter.TagFilter2(), \
-##                                    postsFilter.TagFilter3(), \
-##                                    postsFilter.TagFilter4(), \
-##                                    postsFilter.RatingFilter())
-##    image_index = 0
-##    update_image(False)    
 
 def keypress(event):
     args = event.keysym, event.keycode, event.char 
@@ -328,6 +343,7 @@ db = DanbooruDB()
 filterClass = FilterView(Toplevel(), filterCall, db)
 postsFilter = PostsFilter(Toplevel(), filterCall2)
 _tag = ''
+_last = 0
 
 consumer(tk_root)
 tk_root.mainloop()
