@@ -8,10 +8,24 @@ The set of images to view can be searched / filtered in two ways:
 When a set of images has been specified, the first image (and details) is shown. You may then cycle through all
 the images in the set.
 
-The browser is a simple Tkinter interface and may be run on any platform with Python 3 and Tk installed. Uses the sqlite 
+The browser is a simple Tkinter interface and may be run on any platform with Python 3, Tkinter and PIL installed. Uses the sqlite 
 database as defined by the database project in this repository.
 
-To use:
+## Requirements
+
+The browser requires tkinter and Pillow. These may need to be installed.
+
+```
+sudo apt install python3-tk
+sudo apt install python3-pil
+sudo apt install python3-pil-imagetk
+```
+or
+```
+pip install Pillow
+```
+
+## To use:
 1. The program assumes the database (`danbooru2019.py`) is in the application folder. You can change this in `tagview.py`.
 2. Edit the `IMAGES_BASE` value in `tagview.py` to the path of the image set (e.g. `G:\danbooru2019\original`).
 3. Execute `python tagview.py`
