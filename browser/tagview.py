@@ -82,6 +82,9 @@ def update_image(imageOnly):
     ext = db.getExtForImage(which)
     imagePath = getFilePath(image_ids[image_index], ext[0])
     
+    iw = 0
+    ih = 0
+    
     try:       
         # images in LA mode were not handled nicely [see image 715723]
         im = pil.Image.open(imagePath).convert('RGBA')
