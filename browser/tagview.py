@@ -36,7 +36,7 @@ def clearImage(fault):
         imageCount.config(text="")
         
 def pictresize(event):
-    # picture window being resized
+    # picture window is being resized
     update_image(False)
 
 def formatTagGroup(tagDict, cat):
@@ -82,22 +82,20 @@ def update_image(imageOnly):
     ext = db.getExtForImage(which)
     imagePath = getFilePath(image_ids[image_index], ext[0])
     
+    # Initialize for possible image failure
     iw = 0
     ih = 0
     
     try:       
         # images in LA mode were not handled nicely [see image 715723]
         im = pil.Image.open(imagePath).convert('RGBA')
+        iw,ih = im.size
         
         # resize image to output widget, preserving aspect ratio
         pw = pict.winfo_width()  - 4
         ph = pict.winfo_height() - 4
         
-        #print("Pict:({0},{1})".format(pw,ph))
-        iw,ih = im.size
         newW,newH = im.size
-        
-        #print("Imag:({0},{1})".format(iw,ih))
         im2 = im
 
         if (iw > pw or ih > ph):
@@ -108,8 +106,6 @@ def update_image(imageOnly):
             newW = int(iw * r)
             im2 = im.resize((newW, newH))
             
-        #print("New:({0},{1})".format(newW,newH))
-
         # for canvas: use a global because otherwise the local copy would be garbage collected
         master_image = pil.ImageTk.PhotoImage(im2)
         
@@ -145,7 +141,7 @@ def update_image(imageOnly):
         addTagGroup(info, "Tags", text4)
         addTagGroup(info, "Meta", text5)
         
-        bfont = Font(family="Helvetica", size=10, weight="bold")  # TODO make global?      
+        bfont = Font(family="Helvetica", size=10, weight="bold")  # TODO make global?
         info.tag_configure("bold", font=bfont)
         
         icText = 'Image {0} of {1}'.format(image_index+1,len(image_ids) )
@@ -334,13 +330,15 @@ btnDel.grid(row=3,column=0,sticky=W)
 btnFile.grid(row=3,column=2,sticky=E)
 
 tk_root.rowconfigure(0, weight=1)
-tk_root.columnconfigure(0, minsize=150, weight=0)
-tk_root.columnconfigure(1, weight=0)
+tk_root.columnconfigure(0, minsize=150) # TODO take font size into account?
 tk_root.columnconfigure(3, weight=1)
 
 tk_root.bind("<Key>", keypress)
 tk_root.bind("<Unmap>", minEvent)
 tk_root.bind("<Map>", restoreEvent)
+
+# Nice padding everywhere
+for child in tk_root.winfo_children(): child.grid_configure(padx=3, pady=3)
 
 db = DanbooruDB()
 filterClass = FilterView(Toplevel(), filterCall, db)
