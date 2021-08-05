@@ -1,4 +1,3 @@
-(updating for the Danbooru 2020 dataset in progress)
 
 # Danbooru2020
 Scripts and tools for working with the Danbooru2020 data set.
@@ -86,3 +85,25 @@ In the `reduce` folder are lists of image-ids for the following categories (accu
 |akemi_homura|21,516|
 |reisen_udongein_inaba|21,179|
 |komeiji_koishi|21,071|
+
+### Some More Numbers
+
+Charts showing posting by year of various Copyright / Subjects. The Y-axis is per year, 2005-2020.
+
+**Top 3 by year**
+
+![db2020_top3_by_year](https://user-images.githubusercontent.com/9809727/128425416-54859e7e-d481-4b0a-a214-e70f5c842cf1.png)
+
+**Next Top 5 by year**
+
+![db2020_next5_by_year](https://user-images.githubusercontent.com/9809727/128425605-6bbb633c-07e7-46ba-817f-ebd0e2fddcef.png)
+
+**Top 5 Dwindling Subjects**
+
+![db2020_top5_dwindle](https://user-images.githubusercontent.com/9809727/128425657-d5898b14-d76e-456d-8362-f51b61247de0.png)
+
+**Sample of some recently rising Subjects**
+
+![db2020_recent_rising](https://user-images.githubusercontent.com/9809727/128425748-656bad8e-bb77-4d26-9829-ee5e0b6fcd01.png)
+
+The data used to make these charts can be found in the `tags_by_year` folder.
