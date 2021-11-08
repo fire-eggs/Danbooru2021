@@ -1,3 +1,9 @@
+# The "main window".
+# 1. Showing the current image.
+# 2. Showing information about the image: name, size, rating, and tags.
+# 3. Navigation buttons
+# 4. Operations buttons
+#
 import asyncio
 import os
 import tkinter as tk
@@ -121,9 +127,9 @@ def update_image(imageOnly):
         # tuples of form (category,name) -> dict[category]
         tagDict = dict((k,[v[1] for v in itr]) for k,itr in groupby(tags, itemgetter(0)))
 
-        bytes = os.path.getsize(imagePath)
+        filesize = os.path.getsize(imagePath)
         text0 = '{0}.{1}'.format(which,ext[0])
-        text01 = '\nSize: {2}K ({0}x{1})'.format(iw,ih,int(bytes/1024))
+        text01 = '\nSize: {2}K ({0}x{1})'.format(iw,ih,int(filesize/1024))
         text02 = '\nRating: {0}\n'.format(db.getRatingForImage(which))
         text1 = formatTagGroup(tagDict, 3)
         text2 = formatTagGroup(tagDict, 1)

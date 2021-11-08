@@ -1,3 +1,4 @@
+# Access to the Danbooru sqlite database
 import sqlite3
 
 class DanbooruDB:
@@ -18,16 +19,19 @@ class DanbooruDB:
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of ids
         
+    # Given an image id, return the recorded file extension        
     def getExtForImage(self, image_id):
         self.cur.execute('select file_ext from images where image_id=?', (image_id,))
         res = self.cur.fetchall()
         return res[0]
 
+    # return the first 1000 tag names
     def get_tags(self):
         self.cur.execute('select name from tags order by name limit 1000')
         rows = self.cur.fetchall()
         return rows
                 
+    # return tags matching a filter (in db format, e.g. '%miku%')                
     def get_tags2(self, filter):
         if filter == '':
             return self.get_tags()
@@ -111,6 +115,8 @@ class DanbooruDB:
             return 'Explicit'
         return '?'
 
+    # composes the SQL for a tag-filter query. this is for the 2d onward tag filter.
+    # a filter is a list of ([OR/AND],[NOT],'tag').
     def tagSubClause(self, tFilter):
         res = ''
         val = ''
@@ -126,6 +132,11 @@ class DanbooruDB:
             val = tFilter[2]
         return res, val
     
+    # Get images matching a set of tags as specified in the "filterview".
+    # NOTE: implicit filters include not hidden and not deleted.
+    # See 'tagSubClause' for the description of a 'filter'.
+    # rating : if not empty string, adds a rating clause to the query.
+    #
     def getImagesForTags2(self, filter1, filter2, filter3, filter4, rating):
         params = []
         start = 'select image_id from images where hidden=0 '
@@ -152,7 +163,7 @@ class DanbooruDB:
         #print(tuple(params))
         self.cur.execute(full,params)
         res = self.cur.fetchall()
-        return [i[0] for i in res]
+        return [i[0] for i in res] # list of tuples to list of ids
         
     def getPagedImagesForTag(self,tag_name,rating,last):
         #
