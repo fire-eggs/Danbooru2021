@@ -22,7 +22,7 @@ class FilterView(Frame):
         # Tag filter string
         self.tagString1 = StringVar()
         tagLab = Label(parent,text="Tag filter string ('%' as wildcard)")
-        txtTag1 = Entry(parent, textvariable=self.tagString1)
+        self.txtTag1 = Entry(parent, textvariable=self.tagString1)
 
         # Tag category
         self.catFilter = IntVar()
@@ -33,25 +33,35 @@ class FilterView(Frame):
         catCmb.current(0)
 
         # Tag list
+        listLab = Label(parent,text="Select a tag to view images")
         leftFrame=Frame(parent)
         self.tagList = TagList(leftFrame)
         self.tagList.bindSelect(self.onselect)
         
         doitBtn = Button(parent, text="Apply Filter", command=self.update_tags)
+        clearBtn= Button(parent, text="Reset", command=self.clear)
 
-        tagLab.grid(column=0, row=0)
-        txtTag1.grid(column=0, row=1, sticky=EW)
-        catBtn.grid(column=0, row=2)
-        catCmb.grid(column=0, row=3)
+        tagLab.grid(column=0, row=0, columnspan=2)
+        self.txtTag1.grid(column=0, row=1, columnspan=2, sticky=EW)
+        catBtn.grid(column=0, row=2, columnspan=2)
+        catCmb.grid(column=0, row=3, columnspan=2)
         doitBtn.grid(column=0, row=4)
-        leftFrame.grid(column=0, row=5, sticky=NSEW)
+        clearBtn.grid(column=1,row=4, sticky=E)
+        listLab.grid(column=0,row=5,columnspan=2)
+        leftFrame.grid(column=0, row=6, columnspan=2, sticky=NSEW)
         
-        parent.rowconfigure(5, weight=1)
-        parent.columnconfigure(0, minsize=150, weight=1)
+        parent.rowconfigure(6, weight=1)
+        parent.columnconfigure(0, minsize=100, weight=1)
+        parent.columnconfigure(1, minsize=50)
 
+        # Nice padding everywhere
+        for child in parent.winfo_children(): child.grid_configure(padx=3, pady=3)
+
+        self.txtTag1.focus_set()
         self.update_tags() # initialize tag list
         
     def RatingFilter(self):
+    # rating controls removed: re-instate?
         if self.ratingFilter.get() == 0:
             return ''
         return self.ratingText.get()[0]
@@ -77,4 +87,11 @@ class FilterView(Frame):
 
     def restore(self):
         self.master.deiconify()
+        
+    def clear(self):
+        self.catFilter.set(0)
+        self.catText.set("Artist")
+        self.tagString1.set("")
+        self.txtTag1.focus_set()
+        self.update_tags()
         
