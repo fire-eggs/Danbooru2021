@@ -24,7 +24,9 @@ from tkinter.filedialog import asksaveasfilename
 import _thread, queue, time, threading
 dataQueue = queue.Queue()
 
-IMAGES_BASE = 'G:\\original\\'
+#IMAGES_BASE = 'G:\\original\\'
+#IMAGES_BASE = '/media/kevin/0092C75F92C75834/original'
+IMAGES_BASE = '/mnt/rosie3/db2020w'
 image_ids = []
 image_index = -1
 _last = 0
@@ -87,6 +89,8 @@ def update_image(imageOnly):
 
     ext = db.getExtForImage(which)
     imagePath = getFilePath(image_ids[image_index], ext[0])
+    if (not os.path.exists(imagePath)):
+        imagePath = getFilePath(image_ids[image_index], "webp")
     
     # Initialize for possible image failure
     iw = 0

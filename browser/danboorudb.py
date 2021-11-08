@@ -3,7 +3,7 @@ import sqlite3
 
 class DanbooruDB:
     def __init__(self):
-        self.conn = sqlite3.connect("../danbooru2019.db")
+        self.conn = sqlite3.connect("../db2020.db")
         self.conn.isolation_level = None
         self.cur = self.conn.cursor()
 
