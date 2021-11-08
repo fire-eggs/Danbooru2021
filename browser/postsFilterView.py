@@ -44,7 +44,6 @@ class PostsFilter(Frame):
 
         self.ctrls1[0].grid(column=1,row=0)
         self.ctrls1[1].grid(column=2,row=0)
-        #self.ctrls1[2].grid(column=1,row=0)
 
         self.ctrls2[0].grid(column=1,row=1)
         self.ctrls2[1].grid(column=2,row=1)
@@ -63,6 +62,10 @@ class PostsFilter(Frame):
 
         doitBtn.grid (column=0, row=5)
         clearBtn.grid(column=2, row=5)
+
+        # Nice padding everywhere
+        for child in parent.winfo_children(): child.grid_configure(padx=3, pady=3)
+
 
     def RatingFilter(self):
         if self.ratingFilter.get() == 0:
