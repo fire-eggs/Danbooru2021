@@ -202,3 +202,7 @@ class DanbooruDB:
         res = self.cur.fetchall()
         return res
         
+    def getNotesForImage(self, image_id):
+        self.cur.execute('select x,y,w,h,text from notes where post_id=?', (image_id,))
+        res = self.cur.fetchall()
+        return res      

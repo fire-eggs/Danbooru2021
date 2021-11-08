@@ -10,7 +10,7 @@ import tkinter as tk
 from tkinter import *
 import tkinter.scrolledtext as tkst
 import PIL as pil
-from PIL import Image,ImageTk
+from PIL import Image,ImageTk,ImageDraw
 from danboorudb import *
 from filterview import *
 from postsFilterView import *
@@ -101,6 +101,22 @@ def update_image(imageOnly):
         im = pil.Image.open(imagePath).convert('RGBA')
         iw,ih = im.size
         
+        # draw note rectangles transparently on the original image [before resizing]
+        # despite other suggestions, this code is what worked, see
+        # https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html
+        notes = db.getNotesForImage(which)
+        if (len(notes) > 0):
+          rect = pil.Image.new("RGBA", im.size, (255,255,255,0))
+          draw = ImageDraw.Draw(rect)
+          for note in notes:
+            x = note[0]
+            y = note[1]
+            w = note[2]
+            h = note[3]
+            draw.rectangle(((x, y), (x+w, y+h)), fill=(255, 255, 0, 63))
+            draw.rectangle(((x, y), (x+w, y+h)), outline=(0, 0, 0, 127), width=1)           
+          out = pil.Image.alpha_composite(im, rect)
+          im = out
         # resize image to output widget, preserving aspect ratio
         pw = pict.winfo_width()  - 4
         ph = pict.winfo_height() - 4
@@ -135,6 +151,7 @@ def update_image(imageOnly):
         text0 = '{0}.{1}'.format(which,ext[0])
         text01 = '\nSize: {2}K ({0}x{1})'.format(iw,ih,int(filesize/1024))
         text02 = '\nRating: {0}\n'.format(db.getRatingForImage(which))
+        text03 = 'Notes: {0}\n'.format(str(len(notes)))
         text1 = formatTagGroup(tagDict, 3)
         text2 = formatTagGroup(tagDict, 1)
         text3 = formatTagGroup(tagDict, 4)
@@ -145,6 +162,7 @@ def update_image(imageOnly):
         info.insert(END, text0, ("bold",))
         info.insert(END, text01)
         info.insert(END, text02)
+        info.insert(END, text03)
         addTagGroup(info, "Copyright", text1)
         addTagGroup(info, "Artist", text2)
         addTagGroup(info, "Characters", text3)
