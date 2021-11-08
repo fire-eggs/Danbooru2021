@@ -139,7 +139,7 @@ class DanbooruDB:
     #
     def getImagesForTags2(self, filter1, filter2, filter3, filter4, rating):
         params = []
-        start = 'select image_id from images where hidden=0 '
+        start = 'select image_id from images where is_deleted=0 and hidden=0 '
         if rating != '':
             params.append(rating.lower())
             start += 'and rating=? '
@@ -182,7 +182,7 @@ class DanbooruDB:
         str1 = '''select image_id from images where image_id in 
                    (select image_id from imageTags where tag_id in 
                     (select tag_id from tags where name=?)
-                    and image_id > ? order by image_id) and hidden = 0'''
+                    and image_id > ? order by image_id) and hidden = 0 and is_deleted=0'''
         str2 = " limit 100"
         self.cur.execute( str1 + rate_str + str2, params)
         res = self.cur.fetchall()
