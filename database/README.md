@@ -47,3 +47,10 @@ file. Marks metadata rows with missing images as `hidden |= 2` (see above).
 Diagram manually created via dbdiagram.io/d
 
 ![database schema](schema.png)
+
+### Notes support
+
+"Notes" are not part of gwern's dataset. The file `notes_table.txt` defines
+a table added to the database to store `note` records from Danbooru. As of
+this writing, the browser code has been updated to require this table.
+

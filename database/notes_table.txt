@@ -1,0 +1,10 @@
+CREATE TABLE "notes" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"post_id"	INTEGER,
+	"x"	INTEGER,
+	"y"	INTEGER,
+	"w"	INTEGER,
+	"h"	INTEGER,
+	"text"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)
