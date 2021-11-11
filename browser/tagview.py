@@ -356,6 +356,13 @@ def restoreEvent(event):
             filterClass.restore()
             postsFilter.restore()
 
+def onClose():
+  # identify final window layouts for hard-coded usage in main
+  print(tk_root.winfo_geometry())
+  print(filterClass.master.winfo_geometry())
+  print(postsFilter.master.winfo_geometry())
+  tk_root.destroy()
+  
 ####################################################
 # Main
         
@@ -401,9 +408,22 @@ tk_root.bind("<Map>", restoreEvent)
 # Nice padding everywhere
 for child in tk_root.winfo_children(): child.grid_configure(padx=3, pady=3)
 
+tk_root.protocol("WM_DELETE_WINDOW", onClose)
+
 db = DanbooruDB()
-filterClass = FilterView(Toplevel(), filterCall, db)
-postsFilter = PostsFilter(Toplevel(), filterCall2)
+
+tl1 = Toplevel()
+filterClass = FilterView(tl1, filterCall, db)
+
+tl2 = Toplevel()
+postsFilter = PostsFilter(tl2, filterCall2)
+
+# dirty hack: a nice initial layout that works for me
+tk_root.geometry('888x816+1865+698')
+tl1.geometry('262x500+1599+915')
+tl2.geometry('342x189+1519+695')
+
+
 _tag = ''
 _last = 0
 
