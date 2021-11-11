@@ -20,7 +20,6 @@ from itertools import groupby
 from tkinter.font import Font
 from tkinter.filedialog import asksaveasfilename
 
-
 import _thread, queue, time, threading
 dataQueue = queue.Queue()
 
@@ -30,6 +29,7 @@ IMAGES_BASE = '/mnt/rosie3/db2020w'
 image_ids = []
 image_index = -1
 _last = 0
+image_notes = []
 
 master_image = None
 
@@ -70,11 +70,17 @@ def getFilePath(image_id, ext):
         
     imagePath = os.path.join(IMAGES_BASE, fold, str(image_id) + "." + ext)
     return imagePath
-    
+ 
+def showNote(text):
+  # do something
+  noteLabel.configure(text=text)
+  pass
+  
 def update_image(imageOnly):
     global image_ids
     global image_index
     global master_image
+    global image_notes
     
     clearImage(False)
     if image_index < 0:
@@ -91,6 +97,7 @@ def update_image(imageOnly):
     imagePath = getFilePath(image_ids[image_index], ext[0])
     if (not os.path.exists(imagePath)):
         imagePath = getFilePath(image_ids[image_index], "webp")
+      
     
     # Initialize for possible image failure
     iw = 0
@@ -100,15 +107,15 @@ def update_image(imageOnly):
         # images in LA mode were not handled nicely [see image 715723]
         im = pil.Image.open(imagePath).convert('RGBA')
         iw,ih = im.size
-        
+
         # draw note rectangles transparently on the original image [before resizing]
         # despite other suggestions, this code is what worked, see
         # https://pillow.readthedocs.io/en/stable/reference/ImageDraw.html
-        notes = db.getNotesForImage(which)
-        if (len(notes) > 0):
+        image_notes = db.getNotesForImage(which)
+        if (len(image_notes) > 0):
           rect = pil.Image.new("RGBA", im.size, (255,255,255,0))
           draw = ImageDraw.Draw(rect)
-          for note in notes:
+          for note in image_notes:
             x = note[0]
             y = note[1]
             w = note[2]
@@ -117,6 +124,7 @@ def update_image(imageOnly):
             draw.rectangle(((x, y), (x+w, y+h)), outline=(0, 0, 0, 127), width=1)           
           out = pil.Image.alpha_composite(im, rect)
           im = out
+        
         # resize image to output widget, preserving aspect ratio
         pw = pict.winfo_width()  - 4
         ph = pict.winfo_height() - 4
@@ -137,6 +145,20 @@ def update_image(imageOnly):
         
         pict.delete("all") # clear the previous image
         item = pict.create_image(2, 2, image=master_image, anchor=NW)
+        
+        # create rectangles on the canvas, to which we bind events to show the matching note
+        # TODO 20211111 rectangles are not scaled, i.e. only correct when image is at 100%
+        if (len(image_notes) > 0):
+          for note in image_notes:
+            x = note[0]
+            y = note[1]
+            w = note[2]
+            h = note[3]
+            t = note[4]
+            n1 = pict.create_rectangle(x,y,x+w,y+h,outline='')
+            pict.tag_bind(n1, "<Enter>", lambda event, t=t: showNote(t))
+            pict.tag_bind(n1, "<Leave>", lambda event, t=t: showNote(""))
+                    
     except Exception as e:
         print(e)
         clearImage(True)
@@ -151,7 +173,8 @@ def update_image(imageOnly):
         text0 = '{0}.{1}'.format(which,ext[0])
         text01 = '\nSize: {2}K ({0}x{1})'.format(iw,ih,int(filesize/1024))
         text02 = '\nRating: {0}\n'.format(db.getRatingForImage(which))
-        text03 = 'Notes: {0}\n'.format(str(len(notes)))
+        text03 = 'Notes: {0}\n'.format(str(len(image_notes)))
+        
         text1 = formatTagGroup(tagDict, 3)
         text2 = formatTagGroup(tagDict, 1)
         text3 = formatTagGroup(tagDict, 4)
@@ -257,7 +280,7 @@ def producer(which):
                                             postsFilter.RatingFilter())
             keepgoing = False
         dataQueue.put(image_ids)        
-
+  
 # data queue consumer - looks for updates to the image_id list
 # runs in separate thread so the GUI is responsive
 def consumer(root):
@@ -332,6 +355,9 @@ def restoreEvent(event):
         if (tk_root.winfo_viewable()):
             filterClass.restore()
             postsFilter.restore()
+
+####################################################
+# Main
         
 tk_root = tk.Tk()
 tk_root.title("Danbooru Tag Browser")
@@ -339,8 +365,13 @@ tk_root.minsize(600,400)
 
 # Image info box
 info=tkst.ScrolledText(tk_root,width=30)
+
+# Image canvas
 pict=Canvas(tk_root,bg="white",width=400,height=400,relief=SUNKEN)
 pict.bind("<Configure>", pictresize)
+
+# A hack location to show an image note
+noteLabel = Label(tk_root)
 
 # image count and buttons
 imageCount=Label(tk_root,text=' ', justify=RIGHT)
@@ -349,15 +380,17 @@ btnNext = Button(tk_root, text='Next', command=nextImage)
 btnDel  = Button(tk_root, text='Hide', command=hideImage)
 btnFile = Button(tk_root, text='To File', command=makeFileList)
 
-pict.grid(row=0,column=3,sticky=NSEW,rowspan=4)
-info.grid(row=0,column=0,columnspan=3,sticky=NSEW)
-imageCount.grid(row=1,column=0,sticky=E)
-btnPrev.grid(row=2,column=0,sticky=E)
-btnNext.grid(row=2,column=1,sticky=W)
-btnDel.grid(row=3,column=0,sticky=W)
-btnFile.grid(row=3,column=2,sticky=E)
+noteLabel.grid(row=0,column=3,sticky=NW)
+pict.grid(row=1,column=3,sticky=NSEW,rowspan=4)
+info.grid(row=1,column=0,columnspan=3,sticky=NSEW)
+imageCount.grid(row=2,column=0,sticky=E)
+btnPrev.grid(row=3,column=0,sticky=E)
+btnNext.grid(row=3,column=1,sticky=W)
+btnDel.grid(row=4,column=0,sticky=W)
+btnFile.grid(row=4,column=2,sticky=E)
 
-tk_root.rowconfigure(0, weight=1)
+
+tk_root.rowconfigure(1, weight=1)
 tk_root.columnconfigure(0, minsize=150) # TODO take font size into account?
 tk_root.columnconfigure(3, weight=1)
 
