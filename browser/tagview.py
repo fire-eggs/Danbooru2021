@@ -23,9 +23,7 @@ from tkinter.filedialog import asksaveasfilename
 import _thread, queue, time, threading
 dataQueue = queue.Queue()
 
-#IMAGES_BASE = 'G:\\original\\'
-#IMAGES_BASE = '/media/kevin/0092C75F92C75834/original'
-IMAGES_BASE = '/mnt/rosie3/db2020w'
+IMAGES_BASE = '/mnt/trollf/db2020w'
 image_ids = []
 image_index = -1
 _last = 0
@@ -36,6 +34,7 @@ master_image = None
 def clearImage(fault):
     info.delete(1.0,END)
     pict.delete("all")
+    noteLabel.configure(text="")
     
     if fault:
         pict.config(bg="#FF0000")
@@ -102,6 +101,8 @@ def update_image(imageOnly):
     # Initialize for possible image failure
     iw = 0
     ih = 0
+    image_notes = []
+    imageFail = False
     
     try:       
         # images in LA mode were not handled nicely [see image 715723]
@@ -162,6 +163,7 @@ def update_image(imageOnly):
     except Exception as e:
         print(e)
         clearImage(True)
+        imageFail = True
 
     if not imageOnly:
         tags = db.getTagsForImage2(which)
@@ -169,9 +171,13 @@ def update_image(imageOnly):
         # tuples of form (category,name) -> dict[category]
         tagDict = dict((k,[v[1] for v in itr]) for k,itr in groupby(tags, itemgetter(0)))
 
-        filesize = os.path.getsize(imagePath)
+        if imageFail:
+          text01 = "\nFile not found"
+        else:
+          filesize = os.path.getsize(imagePath)
+          text01 = '\nSize: {2}K ({0}x{1})'.format(iw,ih,int(filesize/1024))
+          
         text0 = '{0}.{1}'.format(which,ext[0])
-        text01 = '\nSize: {2}K ({0}x{1})'.format(iw,ih,int(filesize/1024))
         text02 = '\nRating: {0}\n'.format(db.getRatingForImage(which))
         text03 = 'Notes: {0}\n'.format(str(len(image_notes)))
         
