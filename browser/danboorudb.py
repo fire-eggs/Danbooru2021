@@ -1,9 +1,12 @@
 # Access to the Danbooru sqlite database
+
+# Using [images].is_banned as a holder for "hidden" state
+
 import sqlite3
 
 class DanbooruDB:
     def __init__(self):
-        self.conn = sqlite3.connect("../db2020.db")
+        self.conn = sqlite3.connect("../db2021_meta/db2021.db")
         self.conn.isolation_level = None
         self.cur = self.conn.cursor()
 
@@ -11,14 +14,14 @@ class DanbooruDB:
 
     def getImageIdsForTag(self,tag_name):
         self.cur.execute('''select image_id from images
-                            where hidden = 0 and image_id in 
+                            where is_banned = 0 and image_id in 
                             (select image_id from imageTags where tag_id in 
                                 (select tag_id from tags where name like ?)
                             ) order by image_id ''', (tag_name,))
                             
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of ids
-        
+
     # Given an image id, return the recorded file extension        
     def getExtForImage(self, image_id):
         self.cur.execute('select file_ext from images where image_id=?', (image_id,))
@@ -30,7 +33,7 @@ class DanbooruDB:
         self.cur.execute('select name from tags order by name limit 1000')
         rows = self.cur.fetchall()
         return rows
-                
+
     # return tags matching a filter (in db format, e.g. '%miku%')                
     def get_tags2(self, filter):
         if filter == '':
@@ -70,7 +73,7 @@ class DanbooruDB:
 
         # annoying, this variant is faster than join
         self.cur.execute('''select image_id from images
-                            where hidden = 0 and rating=? and image_id in 
+                            where is_banned = 0 and rating=? and image_id in 
                             (select image_id from imageTags where tag_id in 
                                 (select tag_id from tags where name like ?)
                             ) order by image_id ''', params)
@@ -87,9 +90,9 @@ class DanbooruDB:
         
     def markAsHidden(self,image_id):
         # TODO replace with "update images set hidden=(select hidden from images where image_id=1) | 2 where image_id=1"
-        self.cur.execute("select hidden from images where image_id=?",(image_id,))
+        self.cur.execute("select is_banned from images where image_id=?",(image_id,))
         val = (self.cur.fetchall()[0])[0] | 1
-        self.cur.execute('update images set hidden=? where image_id=?',(val,image_id))
+        self.cur.execute('update images set is_banned=? where image_id=?',(val,image_id))
         
     def getTagsForImage(self,image_id):
         self.cur.execute('''select name from tags where tag_id in 
@@ -139,7 +142,7 @@ class DanbooruDB:
     #
     def getImagesForTags2(self, filter1, filter2, filter3, filter4, rating):
         params = []
-        start = 'select image_id from images where is_deleted=0 and hidden=0 '
+        start = 'select image_id from images where is_deleted=0 and is_banned=0 '
         if rating != '':
             params.append(rating.lower())
             start += 'and rating=? '
@@ -182,7 +185,7 @@ class DanbooruDB:
         str1 = '''select image_id from images where image_id in 
                    (select image_id from imageTags where tag_id in 
                     (select tag_id from tags where name=?)
-                    and image_id > ? order by image_id) and hidden = 0 and is_deleted=0'''
+                    and image_id > ? order by image_id) and is_banned = 0 and is_deleted=0'''
         str2 = " limit 100"
         self.cur.execute( str1 + rate_str + str2, params)
         res = self.cur.fetchall()
@@ -203,6 +206,6 @@ class DanbooruDB:
         return res
         
     def getNotesForImage(self, image_id):
-        self.cur.execute('select x,y,w,h,text from notes where post_id=?', (image_id,))
+        self.cur.execute('select x,y,w,h,body from notes where image_id=?', (image_id,))
         res = self.cur.fetchall()
         return res      
