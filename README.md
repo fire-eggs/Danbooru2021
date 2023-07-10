@@ -1,5 +1,77 @@
+# Danbooru2022
 
-# Danbooru2021
+At this time, Gwern has not provided a 2022 update. To get new numbers, I grabbed the 2022 metadata from the BigData server.
+
+## Numbers for Danbooru 2022:
+
+**Total rows in Images table:** 4,878,068
+
+**Total rows in Tags table:** 498,860
+
+**Top 10 Copyright/Subject Tags:**
+
+|Subject|Count|
+|--|--:|
+|original|830238|
+|touhou|780377|
+|kantai_collection|442753|
+|fate_(series)|264711|
+|fate/grand_order|187941|
+|idolmaster|172642|
+|pokemon|169487|
+|vocaloid|118108|
+|genshin_impact|115403|
+|hololive|115137|
+
+**Top 10 _New_ Copyright tags added 2022:**
+
+|Name|
+|--|
+|pokemon_sv|
+|mahou_shoujo_madoka_magica:_hangyaku_no_monogatari|
+|lycoris_recoil|
+|gundam_suisei_no_majo|
+|cyberpunk_(series)|
+|cyberpunk_edgerunners|
+|xenoblade_chronicles_3|
+|atelier_ryza_1|
+|kemono_friends_v_project|
+|air_(visual_novel)|
+
+**Top 10 Character tags:**
+
+|Name|Count|
+|--|--:|
+|hatsune_miku|78922|
+|hakurei_reimu|67874|
+|kirisame_marisa|62416|
+|remilia_scarlet|46975|
+|flandre_scarlet|43534|
+|izayoi_sakuya|42512|
+|admiral_(kancolle)|34846|
+|artoria_pendragon_(fate)|33160|
+|kochiya_sanae|32563|
+|alice_margatroid|32547|
+
+**Top 10 _New_ Character tags added 2022:**
+
+|Name|Count|
+|--|--:|
+|jeanne_d'arc_alter_(avenger)_(fate)|6737|
+|yae_miko|5796|
+|okita_souji_(koha-ace)|4624|
+|byleth_(female)_(fire_emblem)|4146|
+|jeanne_d'arc_(ruler)_(fate)|4093|
+|boo_tao_(genshin_impact)|3044|
+|asuna_(bunny)_(blue_archive)|2896|
+|corrin_(female)_(fire_emblem)|2528|
+|nishikigi_chisato|2462|
+|yelan_(genshin_impact)|2415|
+
+
+
+## Danbooru 2021
+
 Scripts and tools for working with the Danbooru2021 data set.
 
 1. database - create a sqlite database from the (old-style) metadata files.
