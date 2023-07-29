@@ -1,12 +1,14 @@
 # Danbooru2022
 
 At this time, Gwern has not provided a 2022 update. To get new numbers, I grabbed the 2022 metadata from the BigData server.
+Some numbers thanks to some help from [Datasette](https://datasette.io/)!
+
 
 ## Numbers for Danbooru 2022:
 
-**Total rows in Images table:** 4,878,068
+**Total rows in Images table:** 5,956,691
 
-**Total rows in Tags table:** 498,860
+**Total rows in Tags table:** 603,987
 
 **Top 10 Copyright/Subject Tags:**
 
@@ -68,6 +70,24 @@ At this time, Gwern has not provided a 2022 update. To get new numbers, I grabbe
 |nishikigi_chisato|2462|
 |yelan_(genshin_impact)|2415|
 
+**Top 5 Image Pools**
+
+|Image Count|Pool Name|
+|--:|--|
+|18,354|Disgustingly_Adorable|
+|8,248|Heart-Warming|
+|6,874|Juicy_Details|
+|6,037|Beautiful_Smile|
+|5,684|Slice_of_Life|
+
+**Image Ratings**
+
+|Rating|Count|Description|
+|--|--:|--|
+|s|3,778,887|Safe|
+|g|838,377|?|
+|q|773,854|Questionable|
+|e|565,573|Explicit|
 
 
 ## Danbooru 2021
