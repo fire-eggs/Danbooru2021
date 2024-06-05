@@ -201,6 +201,9 @@ def create_indices1(connect):
   # useful index for looking up image by rating
   c.execute('CREATE INDEX image_rate on images(image_id,rating)')
 
+  # speed up tag queries  # KBR 20240605
+  c.execute("CREATE INDEX valid_images on images(image_id,is_banned,is_deleted)")
+  
   connect.commit()
 
 ################################################################################
