@@ -110,12 +110,12 @@ class DanbooruDB:
     def getRatingForImage(self, image_id):
         self.cur.execute('select rating from images where image_id=?',(image_id,))
         res = self.cur.fetchall()
-        if res[0][0] == 's':
-            return 'Safe'
-        if res[0][0] == 'q':
-            return 'Questionable'
-        if res[0][0] == 'e':
-            return 'Explicit'
+        match res[0][0]:
+          case 'g': return 'General'
+          case 's': return 'Sensitive'
+          case 'q': return 'Questionable'
+          case 'e': return 'Explicit'
+          case _ : return '?'
         return '?'
 
     # composes the SQL for a tag-filter query. this is for the 2d onward tag filter.

@@ -36,7 +36,7 @@ class PostsFilter(Frame):
         self.ratingFilter.set(0)
         rateBtn = Checkbutton(parent, text="Rating", variable=self.ratingFilter)
         self.ratingText = StringVar()
-        rateCmb = ttk.Combobox(parent, values=["Safe","Questionable","Explicit"], textvariable=self.ratingText)
+        rateCmb = ttk.Combobox(parent, values=["General","Sensitive","Questionable","Explicit"], textvariable=self.ratingText)
         rateCmb.current(0)
         
         doitBtn = Button(parent, text="Apply Filter", command=callback)
@@ -70,7 +70,7 @@ class PostsFilter(Frame):
     def RatingFilter(self):
         if self.ratingFilter.get() == 0:
             return ''
-        return self.ratingText.get()[0]
+        return self.ratingText.get().lower()[0]
         
     def TagFilter1(self):
         return (self.vars1[2].get(),
