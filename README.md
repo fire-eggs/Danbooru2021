@@ -1,6 +1,6 @@
 # Danbooru2022
 
-At this time, Gwern has not provided a 2022 update. To get new numbers, I grabbed the 2022 metadata from the BigData server.
+At this time, Gwern has not provided a 2022 update. To get new numbers, I grabbed the 2022 metadata from the BigQuery server.
 Some numbers thanks to some help from [Datasette](https://datasette.io/)!
 
 
