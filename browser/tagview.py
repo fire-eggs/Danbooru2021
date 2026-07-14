@@ -364,9 +364,12 @@ def restoreEvent(event):
 
 def onClose():
   # identify final window layouts for hard-coded usage in main
+  try:
   print(tk_root.winfo_geometry())
   print(filterClass.master.winfo_geometry())
   print(postsFilter.master.winfo_geometry())
+  except:
+      pass # Issue 59: closing a subwindow merely means the layout won't be available
   tk_root.destroy()
   
 ####################################################
