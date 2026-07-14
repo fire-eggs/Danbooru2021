@@ -123,7 +123,8 @@ class DanbooruDB:
     def tagSubClause(self, tFilter):
         res = ''
         val = ''
-        if (tFilter[2] != ''):
+        cleantag = tFilter[2].strip() # Issue 47: don't query on spaces
+        if (cleantag != ''):
             tag2 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name like ?)'
             if (tFilter[0] == 'OR'):
                 op = ' UNION '
@@ -132,7 +133,7 @@ class DanbooruDB:
             if (tFilter[1] == 'NOT'):
                 op = ' EXCEPT '
             res = op + tag2
-            val = tFilter[2]
+            val = cleantag
         return res, val
     
     # Get images matching a set of tags as specified in the "filterview".
@@ -147,14 +148,16 @@ class DanbooruDB:
             params.append(rating.lower())
             start += 'and rating=? '
         start += 'and image_id in '
-        tag1 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name like ?)'
+        tag1 = 'select image_id from imageTags where tag_id in (select tag_id from tags where name ' + ('not ' if filter1[1] else '') + 'like ?)'
         params.append(filter1[2])
+        # TODO: an empty/garbage first filter will return no useful results
 
         tag2, param2 = self.tagSubClause(filter2)
         tag3, param3 = self.tagSubClause(filter3)
         tag4, param4 = self.tagSubClause(filter4)
 
         full = start + '(' + tag1 + tag2 + tag3 + tag4 + ') order by image_id'
+        # Issue 47: an empty param doesn't preclude follow-ons working
         if (param2 != ''):
             params.append(param2)
             if (param3 != ''):
@@ -164,6 +167,7 @@ class DanbooruDB:
         
         #print(full)
         #print(tuple(params))
+        
         self.cur.execute(full,params)
         res = self.cur.fetchall()
         return [i[0] for i in res] # list of tuples to list of ids
